@@ -1,5 +1,6 @@
 // src/Signup.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -7,12 +8,14 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      // Redirect or show success message
+      // Redirect to dashboard after signup
+      navigate('/dashboard');
     } catch (error) {
       setError(error.message);
     }
