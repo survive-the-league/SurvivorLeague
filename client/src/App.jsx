@@ -9,6 +9,8 @@ import Signup from './Signup';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import ProtectedRoute from './ProtectedRoute';
+import JoinLeague from './JoinLeague';
+import CreateLeague from './CreateLeague';
 import { AuthProvider } from './AuthContext';
 
 function App() {
@@ -20,10 +22,12 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /> </ProtectedRoute>} />
+            <Route path="/join-league" element={<ProtectedRoute><JoinLeague /></ProtectedRoute>} />
+            <Route path="/create-league" element={<ProtectedRoute><CreateLeague /></ProtectedRoute>} />
           </Routes>
       </AuthProvider>
     </Router>
   )
-}
+};
 
 export default App

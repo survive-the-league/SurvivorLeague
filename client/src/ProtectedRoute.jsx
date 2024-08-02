@@ -4,8 +4,8 @@ import { useAuth } from './AuthContext';
 
 const ProtectedRoute = ({ children }) => {
     const { currentUser } = useAuth();
-
-    return currentUser ? children : <Navigate to="/login" />;
+    // if unauthenticated, redirect to home page
+    return currentUser ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;
