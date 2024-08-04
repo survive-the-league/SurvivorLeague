@@ -53,10 +53,11 @@ const MakePredictions = () => {
                     where('userId', '==', user.uid), 
                     where('matchweek', '==', matchweek));
                 
+                // query the database with our query
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    
+                    // if there is an existing prediction, update it
                     const existingDoc = querySnapshot.docs[0];
                     const existingDocRef = doc(db, 'predictions', existingDoc.id);
                     await updateDoc(existingDocRef, {
@@ -64,6 +65,7 @@ const MakePredictions = () => {
                     });
                     alert('Prediction updated successfully!');
                 } else {
+                    // if no existing prediction, create a new one
                     const apiUrl = 'http://localhost:3000'; //update to backend URL eventually (some AWS or Google Cloud URL)
                     await axios.post(`${apiUrl}/makePredictions`, {
                         userId: user.uid,
