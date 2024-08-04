@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
 import { useParams } from 'react-router-dom';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 const MakePredictions = () => {
     const { leagueId } = useParams();
@@ -9,18 +10,36 @@ const MakePredictions = () => {
     const [selectedTeam, setSelectedTeam] = useState('');
     const [matchweek, setMatchweek] = useState('');
     const [user, setUser] = useState(null);
+    const [predictions, setPredictions] = useState([]);
 
     useEffect(() => {
 
         setTeams(['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves']);
-        auth.onAuthStateChanged(user => {
+        
+        const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
+
+                const predictionsRef = collection(db, 'predictions');
+                const q = query(predictionsRef, where('leagueId', '==', leagueId), where('userId', '==', user.uid));
+
+                // Firestore Listener provides real-time updates
+                const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
+                    const newPredictions = snapshot.docs.map((doc) => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    setPredictions(newPredictions);
+                });
+
+                return () => unsubscribeFirestore();
             } else {
                 setUser(null);
             }
         });
-    }, []);
+
+        return () => unsubscribeAuth();
+    }, [leagueId]);
 
     const handlePrediction = async () => {
         if (user && selectedTeam && matchweek) {
@@ -56,6 +75,14 @@ const MakePredictions = () => {
                 onChange={(e) => setMatchweek(e.target.value)}
             />
             <button onClick={handlePrediction}>Submit Prediction</button>
+
+            <h2>Your Predictions</h2>
+            <ul>
+                {predictions.map(prediction => (
+                    <li key={prediction.id}>
+                        {prediction.teamId} - Matchweek {prediction.matchweek}</li>
+                    ))}
+            </ul>
         </div>
     );
 };
