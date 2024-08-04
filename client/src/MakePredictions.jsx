@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth, db } from './firebase';
 import { useParams } from 'react-router-dom';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
 
 const MakePredictions = () => {
     const { leagueId } = useParams();
@@ -44,14 +44,38 @@ const MakePredictions = () => {
     const handlePrediction = async () => {
         if (user && selectedTeam && matchweek) {
             try {
-                const apiUrl = 'http://localhost:3000'; //update to backend URL eventually (some AWS or Google Cloud URL)
-                await axios.post(`${apiUrl}/makePredictions`, {
-                    userId: user.uid,
-                    leagueId: leagueId,
-                    matchweek: matchweek,
-                    teamId: selectedTeam,
-            });
-            alert('Prediction made successfully!');
+
+                const predictionsRef = collection(db, 'predictions');
+
+                // Check if the user has already made a prediction for the selected matchweek
+                const q = query(predictionsRef, 
+                    where('leagueId', '==', leagueId), 
+                    where('userId', '==', user.uid), 
+                    where('matchweek', '==', matchweek));
+                
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    
+                    const existingDoc = querySnapshot.docs[0];
+                    const existingDocRef = doc(db, 'predictions', existingDoc.id);
+                    await updateDoc(existingDocRef, {
+                        teamId: selectedTeam
+                    });
+                    alert('Prediction updated successfully!');
+                } else {
+                    const apiUrl = 'http://localhost:3000'; //update to backend URL eventually (some AWS or Google Cloud URL)
+                    await axios.post(`${apiUrl}/makePredictions`, {
+                        userId: user.uid,
+                        leagueId: leagueId,
+                        matchweek: matchweek,
+                        teamId: selectedTeam,
+                    });
+                    alert('Prediction made successfully!');
+                }
+
+                setSelectedTeam('');
+                setMatchweek('');
             } catch (error) {
                 console.error('Error making prediction:', error);
                 alert('Failed to make prediction');
