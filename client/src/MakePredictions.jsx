@@ -8,7 +8,7 @@ const MakePredictions = () => {
     const { leagueId } = useParams();
     const [teams, setTeams] = useState([]);
     const [selectedTeam, setSelectedTeam] = useState('');
-    const [matchweek, setMatchweek] = useState('');
+    const [matchday, setMatchday] = useState('');
     const [user, setUser] = useState(null);
     const [predictions, setPredictions] = useState([]);
 
@@ -42,16 +42,16 @@ const MakePredictions = () => {
     }, [leagueId]);
 
     const handlePrediction = async () => {
-        if (user && selectedTeam && matchweek) {
+        if (user && selectedTeam && matchday) {
             try {
 
                 const predictionsRef = collection(db, 'predictions');
 
-                // Check if the user has already made a prediction for the selected matchweek
+                // Check if the user has already made a prediction for the selected matchday
                 const q = query(predictionsRef, 
                     where('leagueId', '==', leagueId), 
                     where('userId', '==', user.uid), 
-                    where('matchweek', '==', matchweek));
+                    where('matchday', '==', matchday));
                 
                 // query the database with our query
                 const querySnapshot = await getDocs(q);
@@ -70,20 +70,20 @@ const MakePredictions = () => {
                     await axios.post(`${apiUrl}/makePredictions`, {
                         userId: user.uid,
                         leagueId: leagueId,
-                        matchweek: matchweek,
+                        matchday: matchday,
                         teamId: selectedTeam,
                     });
                     alert('Prediction made successfully!');
                 }
 
                 setSelectedTeam('');
-                setMatchweek('');
+                setMatchday('');
             } catch (error) {
                 console.error('Error making prediction:', error);
                 alert('Failed to make prediction');
             }
         } else {
-            alert('Please select a team and matchweek');
+            alert('Please select a team and matchday');
         }
     };
 
@@ -96,9 +96,9 @@ const MakePredictions = () => {
             </select>
             <input
                 type='number'
-                placeholder='Matchweek'
-                value={matchweek}
-                onChange={(e) => setMatchweek(e.target.value)}
+                placeholder='matchday'
+                value={matchday}
+                onChange={(e) => setMatchday(e.target.value)}
             />
             <button onClick={handlePrediction}>Submit Prediction</button>
 
@@ -106,7 +106,7 @@ const MakePredictions = () => {
             <ul>
                 {predictions.map(prediction => (
                     <li key={prediction.id}>
-                        {prediction.teamId} - Matchweek {prediction.matchweek}</li>
+                        {prediction.teamId} - Matchday {prediction.matchday}</li>
                     ))}
             </ul>
         </div>
