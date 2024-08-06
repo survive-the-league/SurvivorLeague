@@ -12,11 +12,10 @@ const MakePredictions = () => {
     const [user, setUser] = useState(null);
     const [predictions, setPredictions] = useState([]);
 
-    useEffect(() => {
-
-        // TODO: Fetch teams from the firebase database
-        setTeams(['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves']);
-        
+    /**
+     * 
+     */
+    useEffect(() => {        
         const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
@@ -38,12 +37,46 @@ const MakePredictions = () => {
                 setUser(null);
             }
         });
-
         return () => unsubscribeAuth();
     }, [leagueId]);
 
     /**
-     * Helper function to check if predictions should be locked
+     *
+     */
+    useEffect(() => {
+        const fetchTeams = async () => {
+            const allTeams = ['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves'];
+            setTeams(allTeams);
+
+            if (user) {
+                const currentMatchday = await fetchCurrentMatchday();
+                // console.log('Current matchday:', currentMatchday); // test
+                const previouslyLockedTeams = await getLockedTeams(user.uid, leagueId, currentMatchday);
+                // console.log('Previously locked teams:', previouslyLockedTeams); // test
+                const availableTeams = filterAvailableTeams(allTeams, previouslyLockedTeams);
+                // console.log('Available teams:', availableTeams); // test
+                setTeams(availableTeams);
+            }
+        };
+        fetchTeams();
+    }, [user, leagueId, matchday]);
+
+    /**
+     * Helper function to fetch the current matchday from the backend
+     * @returns the current matchday
+     */
+    const fetchCurrentMatchday = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+            return response.data.currentMatchday;
+        } catch (error) {
+            console.error('Error fetching current matchday:', error);
+            return null;
+        }
+    };
+
+    /**
+     * Helper function to check if predictions should be locked according to our current matchday
      * @param {*} matchday the current matchday
      * @returns true if predictions should be locked, false otherwise
      */
@@ -80,7 +113,7 @@ const MakePredictions = () => {
         const q = query(predictionsRef, 
             where('leagueId', '==', leagueId), 
             where('userId', '==', user.uid), 
-            where('matchday', '==', matchday));
+            where('matchday', '==', parseInt(matchday, 10)));
         
         // query the database with our query
         const querySnapshot = await getDocs(q);
@@ -97,7 +130,7 @@ const MakePredictions = () => {
         await updateDoc(existingDocRef, {
             teamId: teamId
         });
-    }
+    };
 
     /**
      * Helper function to create a new prediction
@@ -112,9 +145,87 @@ const MakePredictions = () => {
         await axios.post(`${apiUrl}/makePredictions`, {
             userId: user.uid,
             leagueId: leagueId,
-            matchday: matchday,
-            teamId: selectedTeam,
+            // converting matchday to an integer for ease of comparison in database queries
+            matchday: parseInt(matchday, 10),
+            teamId: selectedTeam
         });
+    };
+
+    /**
+     * Helper function to get previously selected teams. NOTE: not previously locked teams, previously selected teams
+     * @param {*} userId id of the user
+     * @param {*} leagueId id of the league
+     * @param {*} currentMatchday current matchday to check if we're before or after 21
+     * @returns list of previously selected teams
+     */
+    const getPreviouslySelectedTeams = async (userId, leagueId, selectedMatchday) => {
+        const predictionsRef = collection(db, 'predictions');
+        let queryForPredictions;
+        // if the matchday is less than or equal to 20, only get predictions for matchdays 1-20
+        if (selectedMatchday < 21) {
+            queryForPredictions = query(predictionsRef, 
+                where('userId', '==', userId), 
+                where('leagueId', '==', leagueId),
+                // checking for any predictions made 0 <= current matchday <= 20
+                where('matchday', '<', 21));
+                // console.log('Query:', queryForPredictions); // test
+        } else {
+            queryForPredictions = query(predictionsRef, 
+                where('userId', '==', userId), 
+                where('leagueId', '==', leagueId), 
+                // checking for any predictions made 21 <= current matchday <= 38
+                where('matchday', '>=', 21));
+        }
+        const querySnapshot = await getDocs(queryForPredictions);
+        const teams = querySnapshot.docs.map(doc => doc.data().teamId);
+        return teams;
+    };
+
+    /**
+     * Helper function to get previously selected teams
+     * @param {*} userId id of the user
+     * @param {*} leagueId id of the league
+     * @returns list of previously selected teams
+     */
+    const getLockedTeams = async (userId, leagueId, currentMatchday) => {
+        const predictionsRef = collection(db, 'predictions');
+        let queryForPredictions;
+        // if the matchday is less than or equal to 20, only get predictions for matchdays 1-20
+        if (currentMatchday < 21) {
+            queryForPredictions = query(predictionsRef, 
+                where('userId', '==', userId), 
+                where('leagueId', '==', leagueId),
+                where('matchday', '<', parseInt(currentMatchday, 10)));
+        } else {
+            queryForPredictions = query(predictionsRef, 
+                where('userId', '==', userId), 
+                where('leagueId', '==', leagueId), 
+                where('matchday', '>=', 21), 
+                where('matchday', '<=', currentMatchday));
+        }
+        const querySnapshot = await getDocs(queryForPredictions);
+        const teams = querySnapshot.docs.map(doc => doc.data().teamId);
+        return teams;
+    };
+
+    /**
+     * Helper function to filter available teams (we exclude teams already picked by user)
+     * @param {*} allTeams list of all teams in the BPL
+     * @param {*} previouslySelectedTeams list of previously selected teams
+     * @returns filtered list of available teams
+     */
+    const filterAvailableTeams = (allTeams, previouslySelectedTeams) => {
+        return allTeams.filter(team => !previouslySelectedTeams.includes(team));
+    };
+
+    /**
+     * Helper function to check if a team can be selected
+     * @param {*} selectedTeam current team the user has selected
+     * @param {*} previouslySelectedTeams list of previously selected teams
+     * @returns true if the team can be selected, false otherwise
+     */
+    const canSelectTeam = async (selectedTeam, previouslySelectedTeams) => {
+        return !previouslySelectedTeams.includes(selectedTeam)
     };
 
     /**
@@ -124,12 +235,22 @@ const MakePredictions = () => {
     const handlePrediction = async () => {
         if (user && selectedTeam && matchday) {
             try {
+
+                // Check if predictions for the selected matchday should be locked
                 const shouldLock = await shouldLockPredictions(matchday);
                 if (shouldLock) {
                     alert('Predictions are locked for this matchday');
                     return;
                 }
 
+                const previouslySelectedTeams = await getPreviouslySelectedTeams(user.uid, leagueId, matchday);
+                const canSelect = await canSelectTeam(selectedTeam, previouslySelectedTeams, matchday);
+                if (!canSelect) {
+                    alert('You have already selected this team for a past matchday.');
+                    return;
+                }
+
+                // check if the user has made an existing prediction for the selected matchday (thus we need to update the prediction)
                 const existingPrediction = await getExistingPrediction(user.uid, leagueId, matchday);
                 if (existingPrediction) {
                     await updatePrediction(existingPrediction.id, selectedTeam);
