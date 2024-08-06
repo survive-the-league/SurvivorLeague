@@ -41,14 +41,23 @@ const MakePredictions = () => {
     }, [leagueId]);
 
     /**
-     *
+     * useEffect is a hook in React that allows you to perform side effects in function components. Side effects can include data fetching, 
+     * direct DOM manipulations, setting up subscriptions, and more. useEffect runs after the render and can optionally clean up after itself
+     * before running again or when the component unmounts.
      */
     useEffect(() => {
         const fetchTeams = async () => {
-            const allTeams = ['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves'];
+            // const allTeams = ['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 
+            //     'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 
+            //     'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 
+            //     'Watford', 'West Ham', 'Wolves'];
+            
+            const response = await axios.get('http://localhost:3000/fetchTeams');
+            const allTeams = response.data;
             setTeams(allTeams);
 
             if (user) {
+                console.log('Teams:', allTeams); // test
                 const currentMatchday = await fetchCurrentMatchday();
                 // console.log('Current matchday:', currentMatchday); // test
                 const previouslyLockedTeams = await getLockedTeams(user.uid, leagueId, currentMatchday);
@@ -56,6 +65,8 @@ const MakePredictions = () => {
                 const availableTeams = filterAvailableTeams(allTeams, previouslyLockedTeams);
                 // console.log('Available teams:', availableTeams); // test
                 setTeams(availableTeams);
+            } else {
+                setTeams(allTeams);
             }
         };
         fetchTeams();
@@ -215,7 +226,7 @@ const MakePredictions = () => {
      * @returns filtered list of available teams
      */
     const filterAvailableTeams = (allTeams, previouslySelectedTeams) => {
-        return allTeams.filter(team => !previouslySelectedTeams.includes(team));
+        return allTeams.filter(team => !previouslySelectedTeams.includes(team.name));
     };
 
     /**
@@ -274,7 +285,12 @@ const MakePredictions = () => {
             <h2>Make Your Prediction</h2>
             <select onChange={(e) => setSelectedTeam(e.target.value)} value={selectedTeam}>
                 <option value=''>Select a team</option>
-                {teams.map(team => (<option key={team} value={team}>{team}</option>))}
+                {
+                teams.map(team => (
+                    <option key={team.name} value={team.name}>
+                        {team.name}
+                    </option>
+                ))}
             </select>
             <input
                 type='number'
