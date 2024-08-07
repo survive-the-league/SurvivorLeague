@@ -11,11 +11,21 @@ const MakePredictions = () => {
     const [matchday, setMatchday] = useState('');
     const [user, setUser] = useState(null);
     const [predictions, setPredictions] = useState([]);
+    const [currentMatchday, setCurrentMatchday] = useState('');
 
     /**
      * 
      */
-    useEffect(() => {        
+    useEffect(() => {     
+        const fetchCurrentMatchday = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+                setCurrentMatchday(response.data.currentMatchday);
+            } catch (error) {
+                console.error('Error fetching current matchday:', error);
+            }
+        };  
+
         const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
@@ -31,6 +41,8 @@ const MakePredictions = () => {
                     }));
                     setPredictions(newPredictions);
                 });
+
+                fetchCurrentMatchday();
 
                 return () => unsubscribeFirestore();
             } else {
@@ -55,10 +67,8 @@ const MakePredictions = () => {
             const response = await axios.get('http://localhost:3000/fetchTeams');
             const allTeams = response.data;
             setTeams(allTeams);
-
-            if (user) {
-                console.log('Teams:', allTeams); // test
-                const currentMatchday = await fetchCurrentMatchday();
+            if (user && currentMatchday) {
+                // const currentMatchday = await fetchCurrentMatchday();
                 // console.log('Current matchday:', currentMatchday); // test
                 const previouslyLockedTeams = await getLockedTeams(user.uid, leagueId, currentMatchday);
                 // console.log('Previously locked teams:', previouslyLockedTeams); // test
@@ -70,21 +80,21 @@ const MakePredictions = () => {
             }
         };
         fetchTeams();
-    }, [user, leagueId, matchday]);
+    }, [user, leagueId, currentMatchday]);
 
-    /**
-     * Helper function to fetch the current matchday from the backend
-     * @returns the current matchday
-     */
-    const fetchCurrentMatchday = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
-            return response.data.currentMatchday;
-        } catch (error) {
-            console.error('Error fetching current matchday:', error);
-            return null;
-        }
-    };
+    // /**
+    //  * Helper function to fetch the current matchday from the backend
+    //  * @returns the current matchday
+    //  */
+    // const fetchCurrentMatchday = async () => {
+    //     try {
+    //         const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+    //         return response.data.currentMatchday;
+    //     } catch (error) {
+    //         console.error('Error fetching current matchday:', error);
+    //         return null;
+    //     }
+    // };
 
     /**
      * Helper function to check if predictions should be locked according to our current matchday
@@ -179,7 +189,6 @@ const MakePredictions = () => {
                 where('leagueId', '==', leagueId),
                 // checking for any predictions made 0 <= current matchday <= 20
                 where('matchday', '<', 21));
-                // console.log('Query:', queryForPredictions); // test
         } else {
             queryForPredictions = query(predictionsRef, 
                 where('userId', '==', userId), 
@@ -212,7 +221,7 @@ const MakePredictions = () => {
                 where('userId', '==', userId), 
                 where('leagueId', '==', leagueId), 
                 where('matchday', '>=', 21), 
-                where('matchday', '<=', currentMatchday));
+                where('matchday', '<=', parseInt(currentMatchday, 10)));
         }
         const querySnapshot = await getDocs(queryForPredictions);
         const teams = querySnapshot.docs.map(doc => doc.data().teamId);
