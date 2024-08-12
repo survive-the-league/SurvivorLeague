@@ -52,12 +52,11 @@ const League = () => {
     }, [currentMatchday]);
 
     /**
-     * Helper function to check if predictions should be locked according to our current matchday
-     * Note: this is a repeated function. Refactor it to a utility function
-     * @param {*} matchday the current matchday
-     * @returns true if predictions should be locked, false otherwise
+     * Function to check if predictions should be displayed publicly
+     * @param {*} matchday the current matchday to check
+     * @returns true if the predictions should be displayed, false otherwise
      */
-    const shouldLockPredictions = async (matchday) => {
+    const shouldShowPredictions = async (matchday) => {
         try {
             // Get the matches for the current matchday
             const matchesRef = collection(db, 'matches');
@@ -73,7 +72,7 @@ const League = () => {
             return currentTime >= firstMatchStartTime;
         } catch (error) {
             console.error('Error checking if predictions should be locked:', error);
-            return true;
+            return false;
         }
     };
 
@@ -92,26 +91,25 @@ const League = () => {
         const predictionsData = querySnapshot.docs.map(async (document) => {
             const prediction = document.data();
 
+            // Get the nickname for the user
             const nicknameDoc = await getDoc(doc(db, 'nicknames', prediction.userId));
+            // If the nickname exists, use it, otherwise use a default value
             const nickname = nicknameDoc.exists() ? nicknameDoc.data().nickname : "Create Nickname";
+
+            // Check if the predictions should be shown
+            const shouldShow = await shouldShowPredictions(currentMatchday);
 
             return {
                 ...prediction,
-                nickname: nickname
+                nickname: nickname,
+                shouldShow: shouldShow
             };
         });
 
         const resolvedPredictions = await Promise.all(predictionsData);
 
-        // Filter the predictions to only show the predictions for the current matchday if the matchday is locked
-        const filteredPredictions = resolvedPredictions.filter(prediction => {
-            if (prediction.matchday === currentMatchday) {
-                // console.log('currentMatchday:', currentMatchday);
-                // console.log('shouldLockPredictions:', shouldLockPredictions(currentMatchday));
-                return shouldLockPredictions(currentMatchday);
-            }
-            return false;
-        });
+        // Filter the predictions to show the predictions for the matchday only if the matchday is locked
+        const filteredPredictions = resolvedPredictions.filter(userPrediction => userPrediction.shouldShow);
         setPredictions(filteredPredictions);
     };
 
@@ -123,7 +121,6 @@ const League = () => {
                     <h3>{league.name}</h3>
                     <p>{league.description}</p>
                     <Link to={`/makePredictions/${leagueId}`}>Make Predictions</Link>
-
                     <h4>Predictions</h4>
                     <ul>
                         {predictions.map((prediction, index) => (
