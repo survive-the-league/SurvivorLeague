@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
 import { collection, query, where, getDocs, doc } from 'firebase/firestore';
+import NicknameWidget from './NicknameWidget';
 
 const Dashboard = () => {
     const { currentUser, logout } = useAuth();
@@ -41,6 +42,7 @@ const Dashboard = () => {
                 <Link to="/create-league">Create a League</Link>
                 <Link to="/join-league">Join a League</Link>
             </nav>
+            <NicknameWidget />
             <h3>Your Leagues</h3>
             <ul>
                 {leagues.map(league => (
