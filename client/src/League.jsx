@@ -123,13 +123,6 @@ const League = () => {
                     <h5>Code: {league.code}</h5>
                     <Link to={`/makePredictions/${leagueId}`}>Make Predictions</Link>
                     <h4>Predictions</h4>
-                    {/* <ul>
-                        {predictions.map((prediction, index) => (
-                            <li key={index}>
-                                User: {prediction.nickname}, Matchday: {prediction.matchday}, Team: {prediction.teamId}
-                            </li>
-                        ))}
-                    </ul> */}
                     <LeagueTable predictions={predictions} />
                 </div>
             ) : (

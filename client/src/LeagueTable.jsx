@@ -24,16 +24,16 @@ const LeagueTable = ({ predictions }) => {
     const users = Object.values(groupedPredictions);
 
     return (
-        <div className="league-table-container">
-            <table className="league-table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        {Array.from({ length: 38 }, (_, i) => (
-                            <th key={i+1}>MD{i+1}</th>
-                        ))}
-                    </tr>
-                </thead>
+        <div className="league-table-scrollable-wrapper">
+                <table className="league-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            {Array.from({ length: 38 }, (_, i) => (
+                                <th key={i + 1}>MD{i + 1}</th>
+                            ))}
+                        </tr>
+                    </thead>
                 <tbody>
                     {users.map((user, index) => (
                         <tr key={index}>

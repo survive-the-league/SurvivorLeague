@@ -1,31 +1,47 @@
-.league-table-container {
-    padding: 20px;
-    overflow-x: auto;
-}
-
-.league-table {
-    width: 100%;
+.league-table-scrollable-wrapper {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    max-width: 100%; /* Make sure the container fits within the parent */
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #444; /* Match the dark gray card style */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .league-table {
+    width: max-content; /* Ensure the table is only as wide as its content */
+    max-width: 100%; /* Make sure the table fits within the parent */
     border-collapse: collapse;
-}
-
-.league-table th, .league-table td {
+  }
+  
+  .league-table th,
+  .league-table td {
     border: 1px solid #ccc;
-    padding: 5px;
+    padding: 8px;
     text-align: center;
-    min-width: 60px;
-}
-
-.prediction-outcome-correct {
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+  
+  .league-table th {
+    background-color: #333;
+    color: white;
+    position: sticky; /* Keep the header fixed at the top */
+    top: 0;
+    z-index: 1;
+  }
+  
+  .prediction-outcome-correct {
     background-color: green;
     color: white;
-}
-
-.prediction-outcome-incorrect {
+  }
+  
+  .prediction-outcome-incorrect {
     background-color: red;
     color: white;
-}
-
-.prediction-outcome-no-prediction {
+  }
+  
+  .prediction-outcome-no-prediction {
     background-color: gray;
     color: white;
-}
+  }
+  
