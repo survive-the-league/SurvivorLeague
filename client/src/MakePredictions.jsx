@@ -3,6 +3,7 @@ import axios from 'axios';
 import { auth, db } from './firebase';
 import { useParams } from 'react-router-dom';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
+import './MakePredictions.css';
 
 const MakePredictions = () => {
     const { leagueId } = useParams();
@@ -113,7 +114,6 @@ const MakePredictions = () => {
             const matchesRef = collection(db, 'matches');
             const currentMatchdayQuery = query(matchesRef, where('matchday', '==', parseInt(matchday, 10)));
             const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-            console.log('Current matchday snapshot:', currentMatchdaySnapshot.docs); // test
             // sort the matches by start time and get the first match
             const currentTime = new Date();
             const firstMatchStartTime = currentMatchdaySnapshot.docs
@@ -258,7 +258,8 @@ const MakePredictions = () => {
      * Function to handle making a prediction
      * @returns error message if prediction fails
      */
-    const handlePrediction = async () => {
+    const handlePrediction = async (e) => {
+        e.preventDefault();
         if (user && selectedTeam && matchday) {
             try {
                 // Check if the matchday is valid
@@ -301,35 +302,48 @@ const MakePredictions = () => {
     };
 
     return (
-        <div>
+        <div className="make-predictions-container">
             <h2>Make Your Prediction</h2>
-            <select onChange={(e) => setSelectedTeam(e.target.value)} value={selectedTeam}>
-                <option value=''>Select a team</option>
-                {
-                teams.map(team => (
-                    <option key={team.name} value={team.name}>
-                        {team.name}
-                    </option>
-                ))}
-            </select>
-            <input
-                type='number'
-                placeholder='matchday'
-                value={matchday}
-                onChange={(e) => {
-                    setMatchday(e.target.value)
-                }}
-                min={1}
-                max={38}
-            />
-            <button onClick={handlePrediction}>Submit Prediction</button>
+            <form onSubmit={handlePrediction} className="make-predictions-form">
+                <label className="predictions-label">
+                    Select Team:
+                    <select 
+                        value={selectedTeam} 
+                        onChange={(e) => setSelectedTeam(e.target.value)}
+                        className="predictions-select">
+                        <option value=''>Select a team</option>
+                        {teams.map(team => (
+                            <option key={team.name} value={team.name}>
+                                {team.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className="predictions-label">
+                    Matchday:
+                    <input 
+                        type='number'
+                        placeholder='Matchday'
+                        value={matchday}
+                        onChange={(e) => setMatchday(e.target.value)}
+                        min={1}
+                        max={38}
+                        className="predictions-input"
+                    />
+                </label>
+
+                <button type="submit" className="predictions-button">Submit Prediction</button>
+            </form>
 
             <h2>Your Predictions</h2>
-            <ul>
+            <ul className="predictions-list">
                 {predictions.map(prediction => (
-                    <li key={prediction.id}>
-                        {prediction.teamId} - Matchday {prediction.matchday}</li>
-                    ))}
+                    <li key={prediction.id} className="predictions-item">
+                        <div className="prediction-team">{prediction.teamId}</div>
+                        <div className="prediction-matchday">Matchday {prediction.matchday}</div>
+                    </li>
+                ))}
             </ul>
         </div>
     );
