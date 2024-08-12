@@ -261,6 +261,11 @@ const MakePredictions = () => {
     const handlePrediction = async () => {
         if (user && selectedTeam && matchday) {
             try {
+                // Check if the matchday is valid
+                if (matchday < 1 || matchday > 38) {
+                    alert('Matchday must be between 1 and 38');
+                    return;
+                }
 
                 // Check if predictions for the selected matchday should be locked
                 const shouldLock = await shouldLockPredictions(matchday);
@@ -311,7 +316,9 @@ const MakePredictions = () => {
                 type='number'
                 placeholder='matchday'
                 value={matchday}
-                onChange={(e) => setMatchday(e.target.value)}
+                onChange={(e) => {
+                    setMatchday(e.target.value)
+                }}
                 min={1}
                 max={38}
             />
