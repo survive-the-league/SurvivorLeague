@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { db } from './firebase';
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import axios from 'axios';
+import LeagueTable from './LeagueTable';
 
 const League = () => {
     const { leagueId } = useParams();
@@ -122,13 +123,14 @@ const League = () => {
                     <h5>Code: {league.code}</h5>
                     <Link to={`/makePredictions/${leagueId}`}>Make Predictions</Link>
                     <h4>Predictions</h4>
-                    <ul>
+                    {/* <ul>
                         {predictions.map((prediction, index) => (
                             <li key={index}>
                                 User: {prediction.nickname}, Matchday: {prediction.matchday}, Team: {prediction.teamId}
                             </li>
                         ))}
-                    </ul>
+                    </ul> */}
+                    <LeagueTable predictions={predictions} />
                 </div>
             ) : (
                 <p>Loading...</p>

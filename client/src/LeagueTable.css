@@ -1,0 +1,31 @@
+.league-table-container {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.league-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.league-table th, .league-table td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.prediction-outcome-correct {
+    background-color: green;
+    color: white;
+}
+
+.prediction-outcome-incorrect {
+    background-color: red;
+    color: white;
+}
+
+.prediction-outcome-no-prediction {
+    background-color: gray;
+    color: white;
+}
