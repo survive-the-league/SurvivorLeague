@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, getDocs, setDoc, query, where, collection } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import './NicknameWidget.css';
 
 const NicknameWidget = () => {
     const [nickname, setNickname] = useState('');
@@ -47,20 +48,34 @@ const NicknameWidget = () => {
     };
 
     return (
-        <div>
-            <h2>Nickname</h2>
-            {currentNickname && <p>Your current nickname is: {currentNickname}</p>}
-            <form onSubmit={handleNicknameChange}>
+        // <div>
+        //     {currentNickname && <p>Your current nickname is: {currentNickname}</p>}
+        //     <form onSubmit={handleNicknameChange}>
+        //         <input
+        //             type="text"
+        //             placeholder="Nickname"
+        //             value={nickname}
+        //             onChange={(e) => setNickname(e.target.value)}
+        //             required
+        //         />
+        //         <button type="submit">Change Nickname</button>
+        //     </form>
+        //     {error && <p>{error}</p>}
+        // </div>
+        <div className="nickname-widget">
+            {currentNickname && <p className="current-nickname">Your current nickname is: {currentNickname}</p>}
+            <form className="nickname-form" onSubmit={handleNicknameChange}>
                 <input
+                    className="nickname-input"
                     type="text"
-                    placeholder="Nickname"
+                    placeholder="Enter your new nickname"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
                     required
                 />
-                <button type="submit">Change Nickname</button>
+                <button className="nickname-button" type="submit">Change Nickname</button>
             </form>
-            {error && <p>{error}</p>}
+            {error && <p className="error-message">{error}</p>}
         </div>
     );
 };
