@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { db } from './firebase';
 import { collection, query, where, getDocs, doc } from 'firebase/firestore';
 import NicknameWidget from './NicknameWidget';
+import './Dashboard.css';
 
 const Dashboard = () => {
     const { currentUser, logout } = useAuth();
@@ -35,22 +36,45 @@ const Dashboard = () => {
     }, [currentUser.uid]);
 
     return (
-        <div>
-            <h2>Welcome, {currentUser.email}</h2>
-            <button onClick={logout}>Logout</button>
-            <nav>
-                <Link to="/create-league">Create a League</Link>
-                <Link to="/join-league">Join a League</Link>
+        // <div>
+        //     <h2>Welcome, {currentUser.email}</h2>
+        //     <button onClick={logout}>Logout</button>
+        //     <nav>
+        //         <Link to="/create-league">Create a League</Link>
+        //         <Link to="/join-league">Join a League</Link>
+        //     </nav>
+        //     <NicknameWidget />
+        //     <h3>Your Leagues</h3>
+        //     <ul>
+        //         {leagues.map(league => (
+        //             <li key={league.id}>
+        //                 <Link to={`/league/${league.id}`}>{league.name}</Link>
+        //             </li>
+        //         ))}
+        //     </ul>
+        // </div>
+        <div className="dashboard-container">
+            <header className="dashboard-header">
+                <h2>Welcome, {currentUser.email}</h2>
+            </header>
+            <nav className="dashboard-nav">
+                <Link className="nav-link" to ="/create-league">Create a League</Link>
+                <Link className="nav-link" to ="/join-league">Join a League</Link>
             </nav>
-            <NicknameWidget />
-            <h3>Your Leagues</h3>
-            <ul>
-                {leagues.map(league => (
-                    <li key={league.id}>
-                        <Link to={`/league/${league.id}`}>{league.name}</Link>
-                    </li>
-                ))}
-            </ul>
+            {/* <NicknameWidget /> */}
+            <section className="leagues-section">
+                <h3>Your Leagues</h3>
+                <div className="leagues-list">
+                    {leagues.map(league => (
+                        <div key={league.id} className="league-card">
+                            <Link to={`/league/${league.id}`} className="league-link">{league.name}</Link>
+                        </div>
+                    ))}
+                </div>
+            </section>
+            <footer className="dashboard-footer">
+                <button className="logout-button" onClick={logout}>Logout</button>
+            </footer>
         </div>
     );
 };
