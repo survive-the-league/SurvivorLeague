@@ -312,6 +312,8 @@ const MakePredictions = () => {
                 placeholder='matchday'
                 value={matchday}
                 onChange={(e) => setMatchday(e.target.value)}
+                min={1}
+                max={38}
             />
             <button onClick={handlePrediction}>Submit Prediction</button>
 
