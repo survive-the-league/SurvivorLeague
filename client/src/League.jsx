@@ -89,10 +89,22 @@ const League = () => {
         // Get the predictions for the current matchday
         const querySnapshot = await getDocs(q);
         // Get the data from the query snapshot
-        const predictionsData = querySnapshot.docs.map(doc => doc.data());
+        const predictionsData = querySnapshot.docs.map(async (document) => {
+            const prediction = document.data();
+
+            const nicknameDoc = await getDoc(doc(db, 'nicknames', prediction.userId));
+            const nickname = nicknameDoc.exists() ? nicknameDoc.data().nickname : "Create Nickname";
+
+            return {
+                ...prediction,
+                nickname: nickname
+            };
+        });
+
+        const resolvedPredictions = await Promise.all(predictionsData);
 
         // Filter the predictions to only show the predictions for the current matchday if the matchday is locked
-        const filteredPredictions = predictionsData.filter(prediction => {
+        const filteredPredictions = resolvedPredictions.filter(prediction => {
             if (prediction.matchday === currentMatchday) {
                 // console.log('currentMatchday:', currentMatchday);
                 // console.log('shouldLockPredictions:', shouldLockPredictions(currentMatchday));
@@ -116,7 +128,7 @@ const League = () => {
                     <ul>
                         {predictions.map((prediction, index) => (
                             <li key={index}>
-                                User: {prediction.userId}, Matchday: {prediction.matchday}, Team: {prediction.teamId}
+                                User: {prediction.nickname}, Matchday: {prediction.matchday}, Team: {prediction.teamId}
                             </li>
                         ))}
                     </ul>
