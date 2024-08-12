@@ -63,12 +63,12 @@ const NicknameWidget = () => {
         //     {error && <p>{error}</p>}
         // </div>
         <div className="nickname-widget">
-            {currentNickname && <p className="current-nickname">Your current nickname is: {currentNickname}</p>}
+            {currentNickname && <p className="current-nickname">Your nickname is: {currentNickname}</p>}
             <form className="nickname-form" onSubmit={handleNicknameChange}>
                 <input
                     className="nickname-input"
                     type="text"
-                    placeholder="Enter your new nickname"
+                    placeholder="Enter a new nickname"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
                     required

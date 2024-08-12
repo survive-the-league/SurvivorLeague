@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, updateDoc, arrayUnion, doc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useAuth } from './AuthContext';
+import './JoinLeague.css';
 
 const JoinLeague = () => {
     const [leagueCode, setLeagueCode] = useState('');
@@ -36,14 +37,20 @@ const JoinLeague = () => {
     };
 
     return (
-        <div>
+        <div className="join-league-container">
             <h2>Join a League</h2>
-            <form onSubmit={handleJoinLeague}>
-                <label>
-                    League Code:
-                    <input type="text" value={leagueCode} onChange={(e) => setLeagueCode(e.target.value)} />
+            <form onSubmit={handleJoinLeague} className="join-league-form">
+                <label className="league-label">
+                    <input 
+                        type="text"
+                        value={leagueCode}
+                        onChange={(e) => setLeagueCode(e.target.value)}
+                        className="league-input"
+                        placeholder="Enter league code"
+                        required
+                    />
                 </label>
-                <button type="submit">Join</button>
+                <button type="submit" className="join-league-button">Join</button>
             </form>
         </div>
     );

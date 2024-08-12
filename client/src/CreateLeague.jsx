@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from './firebase';
+import './CreateLeague.css';
 
 const CreateLeague = () => {
     const [leagueName, setLeagueName] = useState('');
@@ -29,14 +30,19 @@ const CreateLeague = () => {
     };
 
     return (
-        <div>
+        <div className="create-league-container">
             <h2>Create a League</h2>
-            <form onSubmit={handleCreateLeague}>
-                <label>
-                    League Name:
-                    <input type="text" value={leagueName} onChange={(e) => setLeagueName(e.target.value)} />
+            <form onSubmit={handleCreateLeague} className="create-league-form">
+                <label className="league-label">
+                    <input type="text"
+                        value={leagueName}
+                        onChange={(e) => setLeagueName(e.target.value)}
+                        className="league-input"
+                        placeholder="Enter league name"
+                        required
+                     />
                 </label>
-                <button type="submit">Create</button>
+                <button type="submit" className="create-league-button">Create</button>
             </form>
         </div>
     );
