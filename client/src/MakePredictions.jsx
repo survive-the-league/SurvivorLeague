@@ -26,6 +26,9 @@ const MakePredictions = () => {
             }
         };  
 
+        /**
+         * onAuthStateChanged is a method provided by Firebase Authentication that allows you to subscribe to user state changes.
+         */
         const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
@@ -39,6 +42,9 @@ const MakePredictions = () => {
                         id: doc.id,
                         ...doc.data()
                     }));
+                    
+                    // Sort the predictions by matchday for legibility
+                    newPredictions.sort((a, b) => a.matchday - b.matchday);
                     setPredictions(newPredictions);
                 });
 
