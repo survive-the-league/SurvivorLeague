@@ -119,7 +119,7 @@ const League = () => {
             {league ? (
                 <div>
                     <h3>{league.name}</h3>
-                    <p>{league.description}</p>
+                    <h5>Code: {league.code}</h5>
                     <Link to={`/makePredictions/${leagueId}`}>Make Predictions</Link>
                     <h4>Predictions</h4>
                     <ul>
