@@ -111,15 +111,18 @@ const MakePredictions = () => {
         try {
             // Get the matches for the current matchday
             const matchesRef = collection(db, 'matches');
-            const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
+            const currentMatchdayQuery = query(matchesRef, where('matchday', '==', parseInt(matchday, 10)));
             const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-            
+            console.log('Current matchday snapshot:', currentMatchdaySnapshot.docs); // test
             // sort the matches by start time and get the first match
             const currentTime = new Date();
             const firstMatchStartTime = currentMatchdaySnapshot.docs
                 .map(doc => new Date(doc.data().utcDate))
                 .sort((a, b) => a - b)[0];
             // check if the current time is greater than the first match start time
+            console.log('Current time:', currentTime); // test
+            console.log('First match start time:', firstMatchStartTime); // test
+            console.log('Should the team lock:', currentTime >= firstMatchStartTime); // test
             return currentTime >= firstMatchStartTime;
         } catch (error) {
             console.error('Error checking if predictions should be locked:', error);
@@ -269,6 +272,7 @@ const MakePredictions = () => {
 
                 // Check if predictions for the selected matchday should be locked
                 const shouldLock = await shouldLockPredictions(matchday);
+                console.log('Should lock:', shouldLock); // test
                 if (shouldLock) {
                     alert('Predictions are locked for this matchday');
                     return;
