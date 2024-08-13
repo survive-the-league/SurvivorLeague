@@ -52,3 +52,16 @@
     background-color: #0056b3;
   }
   
+  .signup-link {
+    display: block; /* Ensure the text and link are on separate lines */
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #f0f0f0;
+}
+
+.signup-link a {
+    display: inline-block; /* Ensure the link is treated as a block */
+    margin-top: 5px;
+    color: #007bff;
+    text-decoration: none;
+}
