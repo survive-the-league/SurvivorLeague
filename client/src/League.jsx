@@ -118,7 +118,7 @@ const League = () => {
     return (
         <div className="league-container">
             {league ? (
-                <div className="league-container">
+                <div>
                     <h2 className="league-title">{league.name}</h2>
                     <div className="league-details">
                         <h5 className="league-code">Code: {league.code}</h5>

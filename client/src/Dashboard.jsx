@@ -60,10 +60,6 @@ const Dashboard = () => {
             <header className="dashboard-header">
                 <h2>Welcome, {username}</h2>
             </header>
-            <nav className="dashboard-nav">
-                <Link className="nav-link" to ="/create-league">Create a League</Link>
-                <Link className="nav-link" to ="/join-league">Join a League</Link>
-            </nav>
             <section className="leagues-section">
                 <h3>Your Leagues</h3>
                 <div className="leagues-list">
@@ -74,6 +70,10 @@ const Dashboard = () => {
                     ))}
                 </div>
             </section>
+            <nav className="dashboard-nav">
+                <Link className="nav-link" to ="/create-league">Create a League</Link>
+                <Link className="nav-link" to ="/join-league">Join a League</Link>
+            </nav>
             <footer className="dashboard-footer">
                 <button className="logout-button" onClick={logout}>Logout</button>
             </footer>

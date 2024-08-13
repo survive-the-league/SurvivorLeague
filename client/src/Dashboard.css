@@ -16,13 +16,15 @@
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  padding: 10px;
+  gap: 10px;
 }
 
 .nav-link {
   text-decoration: none;
   background-color: #007bff;
   color: white;
-  padding: 12px 20px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-size: 16px;
   transition: background-color 0.3s, box-shadow 0.3s;
