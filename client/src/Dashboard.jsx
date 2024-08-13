@@ -36,23 +36,6 @@ const Dashboard = () => {
     }, [currentUser.uid]);
 
     return (
-        // <div>
-        //     <h2>Welcome, {currentUser.email}</h2>
-        //     <button onClick={logout}>Logout</button>
-        //     <nav>
-        //         <Link to="/create-league">Create a League</Link>
-        //         <Link to="/join-league">Join a League</Link>
-        //     </nav>
-        //     <NicknameWidget />
-        //     <h3>Your Leagues</h3>
-        //     <ul>
-        //         {leagues.map(league => (
-        //             <li key={league.id}>
-        //                 <Link to={`/league/${league.id}`}>{league.name}</Link>
-        //             </li>
-        //         ))}
-        //     </ul>
-        // </div>
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <h2>Welcome, {currentUser.email}</h2>
