@@ -4,6 +4,7 @@ import { db } from './firebase';
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import axios from 'axios';
 import LeagueTable from './LeagueTable';
+import './League.css';
 
 const League = () => {
     const { leagueId } = useParams();
@@ -115,18 +116,19 @@ const League = () => {
     };
 
     return (
-        <div>
-            <h2>League</h2>
+        <div className="league-container">
             {league ? (
-                <div>
-                    <h3>{league.name}</h3>
-                    <h5>Code: {league.code}</h5>
-                    <Link to={`/makePredictions/${leagueId}`}>Make Predictions</Link>
-                    <h4>Predictions</h4>
-                    <LeagueTable predictions={predictions} />
+                <div className="league-container">
+                    <h2 className="league-title">{league.name}</h2>
+                    <div className="league-details">
+                        <h5 className="league-code">Code: {league.code}</h5>
+                        <Link to={`/makePredictions/${leagueId}`} className="make-predictions-link">Make Predictions</Link>
+                        <h4 className="predictions-title">League Board</h4>
+                        <LeagueTable predictions={predictions} />
+                    </div>
                 </div>
-            ) : (
-                <p>Loading...</p>
+                ) : (
+                <p className="loading-text">Loading...</p>
             )}
         </div>
     );
