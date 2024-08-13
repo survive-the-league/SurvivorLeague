@@ -5,7 +5,7 @@ import './App.css'
 import Home from './Home';
 import React from 'react';
 import Login from './Login';
-import Signup from './Signup';
+import SignupPage from './SignupPage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import ProtectedRoute from './ProtectedRoute';
@@ -22,7 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /> </ProtectedRoute>} />
             <Route path="/join-league" element={<ProtectedRoute><JoinLeague /></ProtectedRoute>} />
             <Route path="/create-league" element={<ProtectedRoute><CreateLeague /></ProtectedRoute>} />

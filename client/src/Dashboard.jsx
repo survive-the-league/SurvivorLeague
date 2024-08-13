@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
-import { collection, query, where, getDocs, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import './Dashboard.css';
 
 const Dashboard = () => {
     const { currentUser, logout } = useAuth();
     const [leagues, setLeagues] = useState([]);
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
         const fetchLeagues = async () => {
@@ -31,13 +32,33 @@ const Dashboard = () => {
             }
         };
 
+        /**
+         * Fetches the username for the current user
+         */
+        const fetchUsername = async () => {
+            if (currentUser) {
+                try {
+                    // Get the username document reference
+                    const userRef = doc(db, 'usernames', currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    // Set the username in state if it exists
+                    if (userDoc.exists()) {
+                        setUsername(userDoc.data().username);
+                    }
+                } catch (error) {
+                    console.error('Error fetching username: ', error);
+                }
+            }
+        };
+
         fetchLeagues();
+        fetchUsername();
     }, [currentUser.uid]);
 
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                <h2>Welcome, {currentUser.email}</h2>
+                <h2>Welcome, {username}</h2>
             </header>
             <nav className="dashboard-nav">
                 <Link className="nav-link" to ="/create-league">Create a League</Link>

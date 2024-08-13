@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import './Signup.css';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -33,40 +32,32 @@ const Signup = () => {
 
   return (
     <div className="signup-container">
-       <h1>Sign Up for Survival BPL</h1>
-        <div className="signup-card">
-          <form onSubmit={handleSignup}>
-            <label className="signup-label">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </label>
-            <label className="signup-label">
-              <input
-                type="Username"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </label>
-            <label className="signup-label">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </label>
-            {error && <p className="signup-error">{error}</p>}
-            <button type="submit">Sign Up</button>
-          </form>
-      </div>
+      <h2>Join</h2>
+      <form onSubmit={handleSignup}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="Username"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        <button type="submit">Sign Up</button>
+      </form>
+      {error && <p className="signup-error">{error}</p>}
     </div>
   );
 };
