@@ -93,17 +93,17 @@ const League = () => {
         const predictionsData = querySnapshot.docs.map(async (document) => {
             const prediction = document.data();
 
-            // Get the nickname for the user
-            const nicknameDoc = await getDoc(doc(db, 'nicknames', prediction.userId));
-            // If the nickname exists, use it, otherwise use a default value
-            const nickname = nicknameDoc.exists() ? nicknameDoc.data().nickname : "Create Nickname";
+            // Get the username for the user
+            const usernameDoc = await getDoc(doc(db, 'usernames', prediction.userId));
+            // If the username exists, use it, otherwise use a default value
+            const username = usernameDoc.exists() ? usernameDoc.data().username : "Unknown";
 
             // Check if the predictions should be shown
             const shouldShow = await shouldShowPredictions(currentMatchday);
 
             return {
                 ...prediction,
-                nickname: nickname,
+                username: username,
                 shouldShow: shouldShow
             };
         });

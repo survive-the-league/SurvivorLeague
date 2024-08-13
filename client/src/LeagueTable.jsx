@@ -5,18 +5,18 @@ const LeagueTable = ({ predictions }) => {
 
     // Group predictions by user and matchday
     const groupedPredictions = predictions.reduce((acc, prediction) => {
-        const { nickname, matchday } = prediction;
-        if (!acc[nickname]) {
-            acc[nickname] = { nickname, predictionsByMatchday: {} };
+        const { username, matchday } = prediction;
+        if (!acc[username]) {
+            acc[username] = { username, predictionsByMatchday: {} };
         }
 
         // If the matchday does not exist, create an empty array
-        if (!acc[nickname].predictionsByMatchday[matchday]) {
-            acc[nickname].predictionsByMatchday[matchday] = [];
+        if (!acc[username].predictionsByMatchday[matchday]) {
+            acc[username].predictionsByMatchday[matchday] = [];
         }
 
         // Add the prediction to the array
-        acc[nickname].predictionsByMatchday[matchday].push(prediction);
+        acc[username].predictionsByMatchday[matchday].push(prediction);
         return acc;
     }, {});
 
@@ -37,7 +37,7 @@ const LeagueTable = ({ predictions }) => {
                 <tbody>
                     {users.map((user, index) => (
                         <tr key={index}>
-                        <td>{user.nickname}</td>
+                        <td>{user.username}</td>
                             {Array.from({ length: 38 }, (_, i) => {
                                 const matchday = i + 1;
                                 return (

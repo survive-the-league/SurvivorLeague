@@ -3,7 +3,6 @@ import { useAuth } from './AuthContext';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
 import { collection, query, where, getDocs, doc } from 'firebase/firestore';
-import NicknameWidget from './NicknameWidget';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -54,7 +53,6 @@ const Dashboard = () => {
                     ))}
                 </div>
             </section>
-            <NicknameWidget />
             <footer className="dashboard-footer">
                 <button className="logout-button" onClick={logout}>Logout</button>
             </footer>

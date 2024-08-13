@@ -2,19 +2,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './firebase';
+import { setDoc, doc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 import './Signup.css';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await setDoc(doc(db, 'usernames', user.uid), {
+        userId: user.uid,
+        email: user.email,
+        username: username
+      });
       // Redirect to dashboard after signup
       navigate('/dashboard');
     } catch (error) {
@@ -40,8 +49,8 @@ const Signup = () => {
               <input
                 type="Username"
                 placeholder="Username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </label>
