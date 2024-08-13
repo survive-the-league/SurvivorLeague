@@ -30,12 +30,12 @@
     z-index: 1;
   }
   
-  .prediction-outcome-correct {
+  .prediction-outcome-CORRECT {
     background-color: green;
     color: white;
   }
   
-  .prediction-outcome-incorrect {
+  .prediction-outcome-INCORRECT {
     background-color: red;
     color: white;
   }
