@@ -22,7 +22,6 @@
   }
   
   .auth-card {
-    background-color: #444; /* Dark gray for auth cards */
     padding: 20px;
     width: 45%; /* Adjust the width to balance the layout */
   }
