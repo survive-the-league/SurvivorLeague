@@ -20,7 +20,7 @@ const MakePredictions = () => {
     useEffect(() => {     
         const fetchCurrentMatchday = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+                const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchCurrentMatchday');
                 setCurrentMatchday(response.data.currentMatchday);
             } catch (error) {
                 console.error('Error fetching current matchday:', error);
@@ -71,7 +71,7 @@ const MakePredictions = () => {
             //     'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 
             //     'Watford', 'West Ham', 'Wolves'];
             
-            const response = await axios.get('http://localhost:3000/fetchTeams');
+            const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchTeams');
             const allTeams = response.data;
             setTeams(allTeams);
             if (user && currentMatchday) {
@@ -168,7 +168,7 @@ const MakePredictions = () => {
      */
     const createPrediction = async (userId, leagueId, matchday, teamId) => {
         // if no existing prediction, create a new one
-        const apiUrl = 'http://localhost:3000'; //update to backend URL eventually (some AWS or Google Cloud URL)
+        const apiUrl = 'https://survivor-backend-glmnv44wba-ue.a.run.app'; //update to backend URL eventually (some AWS or Google Cloud URL)
         await axios.post(`${apiUrl}/makePredictions`, {
             userId: user.uid,
             leagueId: leagueId,

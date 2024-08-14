@@ -34,7 +34,7 @@ const League = () => {
                 setCurrentMatchday(matchdayDoc.data().value);
             } else {
                 try {
-                    const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+                    const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchCurrentMatchday');
                     setCurrentMatchday(response.data.currentMatchday);
                 } catch (error) {
                     console.error('Error fetching current matchday:', error);
