@@ -13,7 +13,7 @@ const League = () => {
     const [league, setLeague] = useState(null);
     const [currentMatchday, setCurrentMatchday] = useState('');
     const [predictions, setPredictions] = useState([]);
-    const [currentLives, setCurrentLives] = useState('');
+    // const [currentLives, setCurrentLives] = useState('');
     const { currentUser } = useAuth();
 
     /**
@@ -46,23 +46,23 @@ const League = () => {
             }
         };
         
-        /**
-         * Fetches the current lives for the user from the database
-         */
-        const fetchCurrentLives = async () => {
-            const userRef = collection(db, 'users');
-            const userLeagueRef = doc(userRef, currentUser.uid, 'leagues', leagueId);
-            const userLeagueSnapshot = await getDoc(userLeagueRef);
-            if (userLeagueSnapshot.exists()) {
-                setCurrentLives(userLeagueSnapshot.data().lives);
-            } else {
-                setCurrentLives('Failed to fetch lives');
-            }
-         };
+        // /**
+        //  * Fetches the current lives for the user from the database
+        //  */
+        // const fetchCurrentLives = async () => {
+        //     const userRef = collection(db, 'users');
+        //     const userLeagueRef = doc(userRef, currentUser.uid, 'leagues', leagueId);
+        //     const userLeagueSnapshot = await getDoc(userLeagueRef);
+        //     if (userLeagueSnapshot.exists()) {
+        //         setCurrentLives(userLeagueSnapshot.data().lives);
+        //     } else {
+        //         setCurrentLives('Err');
+        //     }
+        //  };
 
         fetchLeague();
         fetchCurrentMatchdayFromDatabase();
-        fetchCurrentLives();
+        // fetchCurrentLives();
         // list of dependencies for the useEffect hook
     }, [leagueId, currentUser.uid]);
 
@@ -103,6 +103,17 @@ const League = () => {
         }
     };
 
+    const fetchCurrentLives = async (userId) => {
+        const userRef = collection(db, 'users');
+        const userLeagueRef = doc(userRef, userId, 'leagues', leagueId);
+        const userLeagueSnapshot = await getDoc(userLeagueRef);
+        if (userLeagueSnapshot.exists()) {
+            return userLeagueSnapshot.data().lives;
+        } else {
+            return 'Err';
+        }
+     };
+
     /**
      * Fetches the predictions for the current and previous matchdays from the database
      */
@@ -126,10 +137,13 @@ const League = () => {
             // Check if the predictions should be shown
             const shouldShow = await shouldShowPredictions(prediction.matchday);
 
+            const currentLives = await fetchCurrentLives(prediction.userId);
+
             return {
                 ...prediction,
                 username: username,
-                shouldShow: shouldShow
+                shouldShow: shouldShow,
+                currentLives: currentLives
             };
         });
 
@@ -149,7 +163,7 @@ const League = () => {
                         <h5 className="league-code">Code: {league.code}</h5>
                         <Link to={`/makePredictions/${leagueId}`} className="make-predictions-link">Make Predictions</Link>
                         <h4 className="predictions-title">League Board</h4>
-                        <h6 className="league-code">Current Lives: {currentLives}</h6>
+                        {/* <h6 className="league-code">Current Lives: {currentLives}</h6> */}
                         <LeagueTable predictions={predictions} />
                     </div>
                 </div>

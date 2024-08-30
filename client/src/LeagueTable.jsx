@@ -37,7 +37,7 @@ const LeagueTable = ({ predictions }) => {
                 <tbody>
                     {users.map((user, index) => (
                         <tr key={index}>
-                        <td>{user.username}</td>
+                        <td>{user.username}  | {user.predictionsByMatchday[1]?.[0]?.currentLives}</td>
                             {Array.from({ length: 38 }, (_, i) => {
                                 const matchday = i + 1;
                                 return (
