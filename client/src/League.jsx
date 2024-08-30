@@ -116,6 +116,8 @@ const League = () => {
 
     /**
      * Fetches the predictions for the current and previous matchdays from the database
+     * 
+     * This is a very expensive and poorly designed function. It fetches all the predictions for the league and then filters them
      */
     const fetchUsersPredictions = async () => {
         // Get the predictions collection
