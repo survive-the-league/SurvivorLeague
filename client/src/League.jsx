@@ -60,18 +60,24 @@ const League = () => {
      */
     const shouldShowPredictions = async (matchday) => {
         try {
-            // Get the matches for the current matchday
-            const matchesRef = collection(db, 'matches');
-            const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
-            const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-            
-            // sort the matches by start time and get the first match
-            const currentTime = new Date();
-            const firstMatchStartTime = currentMatchdaySnapshot.docs
-                .map(doc => new Date(doc.data().utcDate))
-                .sort((a, b) => a - b)[0];
-            // check if the current time is greater than the first match start time
-            return currentTime >= firstMatchStartTime;
+            // If the matchday already happened, you can show the predictions
+            if (matchday < currentMatchday) {
+                return true;
+            } else if (parseInt(matchday, 10) == parseInt(currentMatchday, 10)) {
+                // Get the matches for the current matchday
+                const matchesRef = collection(db, 'matches');
+                const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
+                const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
+                
+                // sort the matches by start time and get the first match
+                const currentTime = new Date();
+                const firstMatchStartTime = currentMatchdaySnapshot.docs
+                    .map(doc => new Date(doc.data().utcDate))
+                    .sort((a, b) => a - b)[0];
+                // check if the current time is greater than the first match start time
+                return currentTime >= firstMatchStartTime;
+            }
+            return false;
         } catch (error) {
             console.error('Error checking if predictions should be locked:', error);
             return false;
@@ -99,7 +105,7 @@ const League = () => {
             const username = usernameDoc.exists() ? usernameDoc.data().username : "Unknown";
 
             // Check if the predictions should be shown
-            const shouldShow = await shouldShowPredictions(currentMatchday);
+            const shouldShow = await shouldShowPredictions(prediction.matchday);
 
             return {
                 ...prediction,
