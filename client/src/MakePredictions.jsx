@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth, db } from './firebase';
 import { useParams } from 'react-router-dom';
-import { collection, query, where, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, getDocs, getDoc } from 'firebase/firestore';
 import './MakePredictions.css';
 
 const MakePredictions = () => {
@@ -168,14 +168,33 @@ const MakePredictions = () => {
      */
     const createPrediction = async (userId, leagueId, matchday, teamId) => {
         // if no existing prediction, create a new one
-        const apiUrl = 'https://survivor-backend-glmnv44wba-ue.a.run.app'; //update to backend URL eventually (some AWS or Google Cloud URL)
+        const apiUrl = 'https://survivor-backend-glmnv44wba-ue.a.run.app'; // Google Cloud URL
+        const username = await fetchUsername();
         await axios.post(`${apiUrl}/makePredictions`, {
             userId: user.uid,
+            username: username,
             leagueId: leagueId,
             // converting matchday to an integer for ease of comparison in database queries
             matchday: parseInt(matchday, 10),
             teamId: selectedTeam
         });
+    };
+
+    const fetchUsername = async () => {
+        if (user) {
+            try {
+                // Get the username document reference
+                const userRef = doc(db, 'usernames', user.uid);
+                const userDoc = await getDoc(userRef);
+                // Set the username in state if it exists
+                if (userDoc.exists()) {
+                    return userDoc.data().username;
+                }
+                return user.uid;
+            } catch (error) {
+                console.error('Error fetching username: ', error);
+            }
+        }
     };
 
     /**
