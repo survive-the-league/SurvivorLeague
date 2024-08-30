@@ -5,19 +5,23 @@ import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firesto
 import axios from 'axios';
 import LeagueTable from './LeagueTable';
 import './League.css';
+import { useAuth } from './AuthContext';
+
 
 const League = () => {
     const { leagueId } = useParams();
     const [league, setLeague] = useState(null);
     const [currentMatchday, setCurrentMatchday] = useState('');
     const [predictions, setPredictions] = useState([]);
+    const [currentLives, setCurrentLives] = useState('');
+    const { currentUser } = useAuth();
 
     /**
      * useEffect is a React Hook that lets you synchronize a component with an external system.
      */
     useEffect(() => {
         const fetchLeague = async () => {
-            const leagueCollection = collection(db, 'leagues')
+            const leagueCollection = collection(db, 'leagues');
             const leagueRef = doc(leagueCollection, leagueId);
             const leagueDoc = await getDoc(leagueRef);
             if (leagueDoc.exists) {
@@ -41,11 +45,26 @@ const League = () => {
                 }
             }
         };
+        
+        /**
+         * Fetches the current lives for the user from the database
+         */
+        const fetchCurrentLives = async () => {
+            const userRef = collection(db, 'users');
+            const userLeagueRef = doc(userRef, currentUser.uid, 'leagues', leagueId);
+            const userLeagueSnapshot = await getDoc(userLeagueRef);
+            if (userLeagueSnapshot.exists()) {
+                setCurrentLives(userLeagueSnapshot.data().lives);
+            } else {
+                setCurrentLives('Failed to fetch lives');
+            }
+         };
 
         fetchLeague();
         fetchCurrentMatchdayFromDatabase();
+        fetchCurrentLives();
         // list of dependencies for the useEffect hook
-    }, [leagueId]);
+    }, [leagueId, currentUser.uid]);
 
     useEffect(() => {
         if (currentMatchday !== null) {
@@ -130,6 +149,7 @@ const League = () => {
                         <h5 className="league-code">Code: {league.code}</h5>
                         <Link to={`/makePredictions/${leagueId}`} className="make-predictions-link">Make Predictions</Link>
                         <h4 className="predictions-title">League Board</h4>
+                        <h6 className="league-code">Current Lives: {currentLives}</h6>
                         <LeagueTable predictions={predictions} />
                     </div>
                 </div>
