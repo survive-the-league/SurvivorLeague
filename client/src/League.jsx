@@ -85,9 +85,13 @@ const League = () => {
             } else if (parseInt(matchday, 10) == parseInt(currentMatchday, 10)) {
                 // Get the matches for the current matchday
                 const matchesRef = collection(db, 'matches');
+                console.log(matchesRef);
                 const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
                 const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-                
+                console.log(currentMatchdaySnapshot.docs);
+                if (currentMatchdaySnapshot.docs.length == 0) {
+                    return true;
+                }
                 // sort the matches by start time and get the first match
                 const currentTime = new Date();
                 const firstMatchStartTime = currentMatchdaySnapshot.docs
