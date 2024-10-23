@@ -1,0 +1,60 @@
+.signuppageauth-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #333333cc; /* Dark background */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: white; /* Light text color */
+  text-align: center;
+  z-index: 2;
+}
+
+.signuppageauth-container h1 {
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  color: #f0f0f0; /* Light color for the heading */
+}
+
+.signuppage-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 0px;
+}
+
+.signuppage-card {
+max-width: 300px;
+  width: 100%; /* Adjust the width to balance the layout */
+}
+
+.signuppage-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.signuppage-card input {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.signuppage-card button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signuppage-card button:hover {
+  background-color: #0056b3;
+}
+@media (max-width:768px) {
+  .signuppageauth-container {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+}
