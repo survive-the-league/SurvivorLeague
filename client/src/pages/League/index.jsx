@@ -5,19 +5,23 @@ import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firesto
 import axios from 'axios';
 import LeagueTable from '../../components/LeagueTable';
 import './League.css';
+import { useAuth } from './AuthContext';
+
 
 const League = () => {
     const { leagueId } = useParams();
     const [league, setLeague] = useState(null);
     const [currentMatchday, setCurrentMatchday] = useState('');
     const [predictions, setPredictions] = useState([]);
+    // const [currentLives, setCurrentLives] = useState('');
+    const { currentUser } = useAuth();
 
     /**
      * useEffect is a React Hook that lets you synchronize a component with an external system.
      */
     useEffect(() => {
         const fetchLeague = async () => {
-            const leagueCollection = collection(db, 'leagues')
+            const leagueCollection = collection(db, 'leagues');
             const leagueRef = doc(leagueCollection, leagueId);
             const leagueDoc = await getDoc(leagueRef);
             if (leagueDoc.exists) {
@@ -34,18 +38,33 @@ const League = () => {
                 setCurrentMatchday(matchdayDoc.data().value);
             } else {
                 try {
-                    const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+                    const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchCurrentMatchday');
                     setCurrentMatchday(response.data.currentMatchday);
                 } catch (error) {
                     console.error('Error fetching current matchday:', error);
                 }
             }
         };
+        
+        // /**
+        //  * Fetches the current lives for the user from the database
+        //  */
+        // const fetchCurrentLives = async () => {
+        //     const userRef = collection(db, 'users');
+        //     const userLeagueRef = doc(userRef, currentUser.uid, 'leagues', leagueId);
+        //     const userLeagueSnapshot = await getDoc(userLeagueRef);
+        //     if (userLeagueSnapshot.exists()) {
+        //         setCurrentLives(userLeagueSnapshot.data().lives);
+        //     } else {
+        //         setCurrentLives('Err');
+        //     }
+        //  };
 
         fetchLeague();
         fetchCurrentMatchdayFromDatabase();
+        // fetchCurrentLives();
         // list of dependencies for the useEffect hook
-    }, [leagueId]);
+    }, [leagueId, currentUser.uid]);
 
     useEffect(() => {
         if (currentMatchday !== null) {
@@ -60,18 +79,28 @@ const League = () => {
      */
     const shouldShowPredictions = async (matchday) => {
         try {
-            // Get the matches for the current matchday
-            const matchesRef = collection(db, 'matches');
-            const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
-            const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-            
-            // sort the matches by start time and get the first match
-            const currentTime = new Date();
-            const firstMatchStartTime = currentMatchdaySnapshot.docs
-                .map(doc => new Date(doc.data().utcDate))
-                .sort((a, b) => a - b)[0];
-            // check if the current time is greater than the first match start time
-            return currentTime >= firstMatchStartTime;
+            // If the matchday already happened, you can show the predictions
+            if (matchday < currentMatchday) {
+                return true;
+            } else if (parseInt(matchday, 10) == parseInt(currentMatchday, 10)) {
+                // Get the matches for the current matchday
+                const matchesRef = collection(db, 'matches');
+                console.log(matchesRef);
+                const currentMatchdayQuery = query(matchesRef, where('matchday', '==', matchday));
+                const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
+                console.log(currentMatchdaySnapshot.docs);
+                if (currentMatchdaySnapshot.docs.length == 0) {
+                    return true;
+                }
+                // sort the matches by start time and get the first match
+                const currentTime = new Date();
+                const firstMatchStartTime = currentMatchdaySnapshot.docs
+                    .map(doc => new Date(doc.data().utcDate))
+                    .sort((a, b) => a - b)[0];
+                // check if the current time is greater than the first match start time
+                return currentTime >= firstMatchStartTime;
+            }
+            return false;
         } catch (error) {
             console.error('Error checking if predictions should be locked:', error);
             return false;
@@ -91,6 +120,8 @@ const League = () => {
 
     /**
      * Fetches the predictions for the current and previous matchdays from the database
+     * 
+     * This is a very expensive and poorly designed function. It fetches all the predictions for the league and then filters them
      */
     const fetchUsersPredictions = async () => {
         // Get the predictions collection
@@ -111,10 +142,9 @@ const League = () => {
             const username = usernameDoc.exists() ? usernameDoc.data().username : "Unknown";
 
             // Check if the predictions should be shown
-            const shouldShow = await shouldShowPredictions(currentMatchday);
+            const shouldShow = await shouldShowPredictions(prediction.matchday);
 
             const currentLives = await fetchCurrentLives(prediction.userId);
-
             return {
                 ...prediction,
                 username: username,
@@ -147,6 +177,7 @@ const League = () => {
                     </div>
                   
                         <h4 className="predictions-title">League Board</h4>
+                        {/* <h6 className="league-code">Current Lives: {currentLives}</h6> */}
                         <LeagueTable predictions={predictions} />
              
                 </Fragment>

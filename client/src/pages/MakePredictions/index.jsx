@@ -21,7 +21,7 @@ const MakePredictions = () => {
     useEffect(() => {     
         const fetchCurrentMatchday = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
+                const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchCurrentMatchday');
                 setCurrentMatchday(response.data.currentMatchday);
             } catch (error) {
                 console.error('Error fetching current matchday:', error);
@@ -72,7 +72,7 @@ const MakePredictions = () => {
             //     'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 
             //     'Watford', 'West Ham', 'Wolves'];
             
-            const response = await axios.get('http://localhost:3000/fetchTeams');
+            const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchTeams');
             const allTeams = response.data;
             setTeams(allTeams);
             if (user && currentMatchday) {
@@ -169,14 +169,33 @@ const MakePredictions = () => {
      */
     const createPrediction = async (userId, leagueId, matchday) => {
         // if no existing prediction, create a new one
-        const apiUrl = 'http://localhost:3000'; //update to backend URL eventually (some AWS or Google Cloud URL)
+        const apiUrl = 'https://survivor-backend-glmnv44wba-ue.a.run.app'; // Google Cloud URL
+        const username = await fetchUsername();
         await axios.post(`${apiUrl}/makePredictions`, {
             userId: user.uid,
+            username: username,
             leagueId: leagueId,
             // converting matchday to an integer for ease of comparison in database queries
             matchday: parseInt(matchday, 10),
             teamId: selectedTeam
         });
+    };
+
+    const fetchUsername = async () => {
+        if (user) {
+            try {
+                // Get the username document reference
+                const userRef = doc(db, 'usernames', user.uid);
+                const userDoc = await getDoc(userRef);
+                // Set the username in state if it exists
+                if (userDoc.exists()) {
+                    return userDoc.data().username;
+                }
+                return user.uid;
+            } catch (error) {
+                console.error('Error fetching username: ', error);
+            }
+        }
     };
 
     /**
