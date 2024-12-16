@@ -1,19 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+// import { useState } from 'react'
+// import reactLogo from './assets/react.svg'
+// import viteLogo from '/vite.svg'
 import './App.css'
-import Home from './Home';
-import React from 'react';
-import Login from './Login';
-import SignupPage from './SignupPage';
+// import React from 'react';
+// import Login from './Login';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './Dashboard';
-import ProtectedRoute from './ProtectedRoute';
-import JoinLeague from './JoinLeague';
-import CreateLeague from './CreateLeague';
-import { AuthProvider } from './AuthContext';
-import MakePredictions from './MakePredictions';
-import League from './League';
+import ProtectedRoute from './middleware/ProtectedRoute';
+import JoinLeague from './pages/JoinLeague';
+import CreateLeague from './pages/CreateLeague';
+import { AuthProvider } from './context/AuthContext';
+import MakePredictions from './pages/MakePredictions';
+import League from './pages/League';
+import Home from './pages/Home';
+import SignupPage from './pages/SignUp';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
       <AuthProvider>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
+            {/* <Route path="/login" element={<Login />} /> */}
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /> </ProtectedRoute>} />
             <Route path="/join-league" element={<ProtectedRoute><JoinLeague /></ProtectedRoute>} />
@@ -32,6 +32,6 @@ function App() {
       </AuthProvider>
     </Router>
   )
-};
+}
 
 export default App
