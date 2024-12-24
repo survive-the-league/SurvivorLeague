@@ -11,26 +11,20 @@ const MakePredictions = () => {
     const [selectedTeam, setSelectedTeam] = useState('');
     const [matchday, setMatchday] = useState('');
     const [user, setUser] = useState(null);
-    console.log(user,"user")
     const [predictions, setPredictions] = useState([]);
     const [currentMatchday, setCurrentMatchday] = useState('');
+    const [isUpdate, setIsUpdate]  =useState(false)
 
-    /**
-     * 
-     */
     useEffect(() => {     
         const fetchCurrentMatchday = async () => {
             try {
-                const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchCurrentMatchday');
+                const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/fetchCurrentMatchday`);
                 setCurrentMatchday(response.data.currentMatchday);
             } catch (error) {
                 console.error('Error fetching current matchday:', error);
             }
-        };  
+        };
 
-        /**
-         * onAuthStateChanged is a method provided by Firebase Authentication that allows you to subscribe to user state changes.
-         */
         const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
@@ -38,17 +32,15 @@ const MakePredictions = () => {
                 const predictionsRef = collection(db, 'predictions');
                 const q = query(predictionsRef, where('leagueId', '==', leagueId), where('userId', '==', user.uid));
 
-                // Firestore Listener provides real-time updates
                 const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
                     const newPredictions = snapshot.docs.map((doc) => ({
                         id: doc.id,
                         ...doc.data()
                     }));
                     
-                    // Sort the predictions by matchday for legibility
                     newPredictions.sort((a, b) => a.matchday - b.matchday);
                     setPredictions(newPredictions);
-                }); 
+                });
 
                 fetchCurrentMatchday();
 
@@ -57,31 +49,18 @@ const MakePredictions = () => {
                 setUser(null);
             }
         });
+
         return () => unsubscribeAuth();
     }, [leagueId]);
 
-    /**
-     * useEffect is a hook in React that allows you to perform side effects in function components. Side effects can include data fetching, 
-     * direct DOM manipulations, setting up subscriptions, and more. useEffect runs after the render and can optionally clean up after itself
-     * before running again or when the component unmounts.
-     */
     useEffect(() => {
         const fetchTeams = async () => {
-            // const allTeams = ['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 
-            //     'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Leeds', 'Leicester', 
-            //     'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 
-            //     'Watford', 'West Ham', 'Wolves'];
-            
-            const response = await axios.get('https://survivor-backend-glmnv44wba-ue.a.run.app/fetchTeams');
+            const response = await axios.get(`${import.meta.env.VITE_APP_API_BASE_URL}/fetchTeams`);
             const allTeams = response.data;
             setTeams(allTeams);
             if (user && currentMatchday) {
-                // const currentMatchday = await fetchCurrentMatchday();
-                // console.log('Current matchday:', currentMatchday); // test
                 const previouslyLockedTeams = await getLockedTeams(user.uid, leagueId, currentMatchday);
-                // console.log('Previously locked teams:', previouslyLockedTeams); // test
                 const availableTeams = filterAvailableTeams(allTeams, previouslyLockedTeams);
-                // console.log('Available teams:', availableTeams); // test
                 setTeams(availableTeams);
             } else {
                 setTeams(allTeams);
@@ -90,37 +69,15 @@ const MakePredictions = () => {
         fetchTeams();
     }, [user, leagueId, currentMatchday]);
 
-    // /**
-    //  * Helper function to fetch the current matchday from the backend
-    //  * @returns the current matchday
-    //  */
-    // const fetchCurrentMatchday = async () => {
-    //     try {
-    //         const response = await axios.get('http://localhost:3000/fetchCurrentMatchday');
-    //         return response.data.currentMatchday;
-    //     } catch (error) {
-    //         console.error('Error fetching current matchday:', error);
-    //         return null;
-    //     }
-    // };
-
-    /**
-     * Helper function to check if predictions should be locked according to our current matchday
-     * @param {*} matchday the current matchday
-     * @returns true if predictions should be locked, false otherwise
-     */
     const shouldLockPredictions = async (matchday) => {
         try {
-            // Get the matches for the current matchday
             const matchesRef = collection(db, 'matches');
             const currentMatchdayQuery = query(matchesRef, where('matchday', '==', parseInt(matchday, 10)));
             const currentMatchdaySnapshot = await getDocs(currentMatchdayQuery);
-            // sort the matches by start time and get the first match
             const currentTime = new Date();
             const firstMatchStartTime = currentMatchdaySnapshot.docs
                 .map(doc => new Date(doc.data().utcDate))
                 .sort((a, b) => a - b)[0];
-            // check if the current time is greater than the first match start time
             return currentTime >= firstMatchStartTime;
         } catch (error) {
             console.error('Error checking if predictions should be locked:', error);
@@ -128,31 +85,17 @@ const MakePredictions = () => {
         }
     };
 
-    /**
-     * Helper function to get an existing prediction
-     * @param {*} userId id of the user
-     * @param {*} leagueId id of the league
-     * @param {*} matchday the matchday
-     * @returns prediction document if it exists, null otherwise
-     */
     const getExistingPrediction = async (userId, leagueId, matchday) => {
         const predictionsRef = collection(db, 'predictions');
-        // Check if the user has already made a prediction for the selected matchday
         const q = query(predictionsRef, 
             where('leagueId', '==', leagueId), 
             where('userId', '==', user.uid), 
             where('matchday', '==', parseInt(matchday, 10)));
         
-        // query the database with our query
         const querySnapshot = await getDocs(q);
         return querySnapshot.empty ? null : querySnapshot.docs[0];
     };
 
-    /**
-     * Helper function to update an existing prediction
-     * @param {*} docId id of the prediction document
-     * @param {*} teamId id of the team
-     */
     const updatePrediction = async (docId, teamId) => {
         const existingDocRef = doc(db, 'predictions', docId);
         await updateDoc(existingDocRef, {
@@ -160,34 +103,23 @@ const MakePredictions = () => {
         });
     };
 
-    /**
-     * Helper function to create a new prediction
-     * @param {*} userId id of the user
-     * @param {*} leagueId id of the league
-     * @param {*} matchday matchday selected
-     * @param {*} teamId id of the team
-     */
-    const createPrediction = async (userId, leagueId, matchday) => {
-        // if no existing prediction, create a new one
-        const apiUrl = 'https://survivor-backend-glmnv44wba-ue.a.run.app'; // Google Cloud URL
+    const createPrediction = async (userId, leagueId, matchday, teamId) => {
+        const apiUrl = import.meta.env.VITE_APP_API_BASE_URL;
         const username = await fetchUsername();
         await axios.post(`${apiUrl}/makePredictions`, {
             userId: user.uid,
             username: username,
             leagueId: leagueId,
-            // converting matchday to an integer for ease of comparison in database queries
             matchday: parseInt(matchday, 10),
-            teamId: selectedTeam
+            teamId: teamId
         });
     };
 
     const fetchUsername = async () => {
         if (user) {
             try {
-                // Get the username document reference
                 const userRef = doc(db, 'usernames', user.uid);
                 const userDoc = await getDoc(userRef);
-                // Set the username in state if it exists
                 if (userDoc.exists()) {
                     return userDoc.data().username;
                 }
@@ -198,139 +130,26 @@ const MakePredictions = () => {
         }
     };
 
-    /**
-     * Helper function to get previously selected teams. NOTE: not previously locked teams, previously selected teams
-     * @param {*} userId id of the user
-     * @param {*} leagueId id of the league
-     * @param {*} currentMatchday current matchday to check if we're before or after 21
-     * @returns list of previously selected teams
-     */
-    const getPreviouslySelectedTeams = async (userId, leagueId, selectedMatchday) => {
-        const predictionsRef = collection(db, 'predictions');
-        let queryForPredictions;
-        // if the matchday is less than or equal to 20, only get predictions for matchdays 1-20
-        if (selectedMatchday < 21) {
-            queryForPredictions = query(predictionsRef, 
-                where('userId', '==', userId), 
-                where('leagueId', '==', leagueId),
-                // checking for any predictions made 0 <= current matchday <= 20
-                where('matchday', '<', 21));
-        } else {
-            queryForPredictions = query(predictionsRef, 
-                where('userId', '==', userId), 
-                where('leagueId', '==', leagueId), 
-                // checking for any predictions made 21 <= current matchday <= 38
-                where('matchday', '>=', 21));
-        }
-        const querySnapshot = await getDocs(queryForPredictions);
-        const teams = querySnapshot.docs.map(doc => doc.data().teamId);
-        return teams;
-    };
-
-    /**
-     * Helper function to get previously selected teams
-     * @param {*} userId id of the user
-     * @param {*} leagueId id of the league
-     * @returns list of previously selected teams
-     */
-    const getLockedTeams = async (userId, leagueId, currentMatchday) => {
-        const predictionsRef = collection(db, 'predictions');
-        let queryForPredictions;
-        // if the matchday is less than or equal to 20, only get predictions for matchdays 1-20
-        if (currentMatchday < 21) {
-            queryForPredictions = query(predictionsRef, 
-                where('userId', '==', userId), 
-                where('leagueId', '==', leagueId),
-                where('matchday', '<', parseInt(currentMatchday, 10)));
-        } else {
-            queryForPredictions = query(predictionsRef, 
-                where('userId', '==', userId), 
-                where('leagueId', '==', leagueId), 
-                where('matchday', '>=', 21), 
-                where('matchday', '<=', parseInt(currentMatchday, 10)));
-        }
-        const querySnapshot = await getDocs(queryForPredictions);
-        const teams = querySnapshot.docs.map(doc => doc.data().teamId);
-        return teams;
-    };
-
-    /**
-     * Helper function to filter available teams (we exclude teams already picked by user)
-     * @param {*} allTeams list of all teams in the BPL
-     * @param {*} previouslySelectedTeams list of previously selected teams
-     * @returns filtered list of available teams
-     */
-    const filterAvailableTeams = (allTeams, previouslySelectedTeams) => {
-        return allTeams.filter(team => !previouslySelectedTeams.includes(team.name));
-    };
-
-    /**
-     * Helper function to check if a team can be selected
-     * @param {*} selectedTeam current team the user has selected
-     * @param {*} previouslySelectedTeams list of previously selected teams
-     * @returns true if the team can be selected, false otherwise
-     */
-    const canSelectTeam = async (selectedTeam, previouslySelectedTeams) => {
-        return !previouslySelectedTeams.includes(selectedTeam)
-    };
-
-    /**
-     * Function to handle making a prediction
-     * @returns error message if prediction fails
-     */
-
-    const fetchCurrentLives = async (userId) => {
-        const userRef = collection(db, 'users');
-        const userLeagueRef = doc(userRef, userId, 'leagues', leagueId);
-        const userLeagueSnapshot = await getDoc(userLeagueRef);
-        if (userLeagueSnapshot.exists()) {
-            return userLeagueSnapshot.data().lives;
-        } else {
-            return 'Err';
-        }
-     };
-
     const handlePrediction = async (e) => {
         e.preventDefault();
         if (user && selectedTeam && matchday) {
             try {
-                // Fetch current lives
-                const lives = await fetchCurrentLives(user.uid);
-                if (lives === 0) {
-                    alert('You cannot make a prediction because you have no lives left.');
-                    return;
-                }
-    
-                // Check if the matchday is valid
-                if (matchday < 1 || matchday > 38) {
-                    alert('Matchday must be between 1 and 38');
-                    return;
-                }
-    
-                // Check if predictions for the selected matchday should be locked
                 const shouldLock = await shouldLockPredictions(matchday);
                 if (shouldLock) {
                     alert('Predictions are locked for this matchday');
                     return;
                 }
-    
-                const previouslySelectedTeams = await getPreviouslySelectedTeams(user.uid, leagueId, matchday);
-                const canSelect = await canSelectTeam(selectedTeam, previouslySelectedTeams, matchday);
-                if (!canSelect) {
-                    alert('You have already selected this team for a past matchday.');
-                    return;
-                }
-    
-                // Check if the user has made an existing prediction for the selected matchday
+
                 const existingPrediction = await getExistingPrediction(user.uid, leagueId, matchday);
                 if (existingPrediction) {
                     await updatePrediction(existingPrediction.id, selectedTeam);
                     alert('Prediction updated successfully!');
+                    setIsUpdate(false)
                 } else {
                     await createPrediction(user.uid, leagueId, matchday, selectedTeam);
                     alert('Prediction made successfully!');
                 }
-    
+
                 setSelectedTeam('');
                 setMatchday('');
             } catch (error) {
@@ -339,52 +158,87 @@ const MakePredictions = () => {
             }
         }
     };
-    
+
+    const handleUpdatePrediction = async (predictionId, newTeam) => {
+        try {
+            await updatePrediction(predictionId, newTeam);
+            alert('Prediction updated successfully!');
+        } catch (error) {
+            console.error('Error updating prediction:', error);
+            alert('Failed to update prediction');
+        }
+    };
+
+    const handleSelectTeam = (teamName, matchDay) => {
+        setSelectedTeam(teamName);
+        setMatchday(matchDay)
+        setIsUpdate(true)
+    };
+
+    const canUpdatePrediction = (matchday) => {
+        return matchday >= currentMatchday;
+    };
+
     return (
-        <div className='home-bg-main'>
-        <div className="make-predictions-container">
-            <h2>Make Your Prediction</h2>
-            <form onSubmit={handlePrediction} className="make-predictions-form">
-                <label className="predictions-label">
-                    Select Team:
-                    <select 
-                        value={selectedTeam} 
-                        onChange={(e) => setSelectedTeam(e.target.value)}
-                        className="predictions-select">
-                        <option value=''>Select a team</option>
-                        {teams.map(team => (
-                            <option key={team.name} value={team.name}>
-                                {team.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+        <div className="home-bg-main">
+            <div className="make-predictions-container">
+                <h2>Make Your Prediction</h2>
+                <form onSubmit={handlePrediction} className="make-predictions-form">
+                    <label className="predictions-label">
+                        Select Team:
+                        <select 
+                            value={selectedTeam} 
+                            onChange={(e) => setSelectedTeam(e.target.value)}
+                            className="predictions-select">
+                            <option value="">Select a team</option>
+                            {teams.map(team => (
+                                <option key={team.name} value={team.name}>
+                                    {team.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
 
-                <label className="predictions-label">
-                    Matchday:
-                    <input 
-                        type='number'
-                        placeholder='Matchday'
-                        value={matchday}
-                        onChange={(e) => setMatchday(e.target.value)}
-                        min={1}
-                        max={38}
-                        className="predictions-input"
-                    />
-                </label>
+                    <label className="predictions-label">
+                        Matchday:
+                        <input 
+                            type="number"
+                            placeholder="Matchday"
+                            value={matchday}
+                            onChange={(e) => {!isUpdate && setMatchday(e.target.value)}}
+                            min={1}
+                            max={38}
+                            className="predictions-input"
+                            readOnly={isUpdate}
+                            disabled={isUpdate}
+                        />
+                    </label>
 
-                <button type="submit" className="predictions-button">Submit Prediction</button>
-            </form>
-            <h2>Your Predictions</h2>
-            <ul className="predictions-list">
-                {predictions.map(prediction => (
-                    <li key={prediction.id} className="predictions-item">
-                        <div className="prediction-team">{prediction.teamId}</div>
-                        <div className="prediction-matchday">Matchday {prediction.matchday}</div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+                    <button type="submit" className="predictions-button"> {isUpdate ? "Update Prediction" : "Submit Prediction"} </button>
+                </form>
+
+                <h2>Your Predictions</h2>
+                <ul className="predictions-list">
+                    {predictions.map(prediction => (
+                        <li key={prediction.id} className="prediction-item">
+                            <div className="prediction-card">
+                                <div className="prediction-details">
+                                    <div className="prediction-team">{prediction.teamId}</div>
+                                    <div className="prediction-matchday">Matchday {prediction.matchday}</div>
+                                </div>
+
+                                {canUpdatePrediction(prediction.matchday) && (
+                                    <button 
+                                        className="update-button"
+                                        onClick={() => handleSelectTeam(prediction.teamId, prediction.matchday)}>
+                                        Update
+                                    </button>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };
