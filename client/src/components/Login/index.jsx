@@ -13,8 +13,12 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Redirect to dashboard after login
+    const res =   await signInWithEmailAndPassword(auth, email, password);
+      const userData = {
+        userId: res.user.uid,
+        email: res.user.email
+      }
+     localStorage.setItem("user", JSON.stringify(userData))
       navigate('/dashboard');
     } catch (error) {
       setError(error.message);
