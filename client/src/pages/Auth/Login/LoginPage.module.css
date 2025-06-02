@@ -1,0 +1,281 @@
+.loginBg {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  background-color: #0C061D;
+  position: relative;
+  overflow: hidden;
+}
+.leftHalf {
+  flex: 1;
+  background: #181a2a;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+  padding: 2rem;
+  min-width: 200px;
+}
+.logo {
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  width: 120px;
+  height: auto;
+  z-index: 200;
+}
+.rightHalf {
+  position: absolute;
+  width: 80vw;
+  height: 1167px;
+  left: 70%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(0deg, rgba(19, 12, 39, 0.2), rgba(19, 12, 39, 0.2)), url('/assets/futbolista.png') no-repeat center center;
+  background-size: cover;
+  border-top-left-radius: 583.5px;
+  border-bottom-left-radius: 583.5px;
+  z-index: 1;
+  overflow: hidden;
+  
+}
+.rightHalf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 26, 42, 0.25);
+  z-index: 1;
+  pointer-events: none;
+}
+.loginCard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 40px 0 40px;
+  gap: 32px;
+  position: absolute;
+  width: 90%;
+  max-width: 520px;
+  min-width: 320px;
+  left: calc(50% - 520px/2 - 333.5px);
+  top: calc(50% - 680px/2 + 0.28px);
+  background: rgba(15, 9, 32, 0.35);
+  backdrop-filter: blur(49.7541px);
+  border-radius: 12px;
+  box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.25), 0 2px 16px 0 rgba(24, 26, 42, 0.18);
+  z-index: 100;
+}
+
+.title {
+  height: 30px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 48px;
+  color: #F2F0FF;
+  margin: 0 0 2px 0;
+  text-align: left;
+  width: 100%;
+}
+.subtitle {
+  height: 21px;
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 21px;
+  color: #B5B3BC;
+  margin: 0 0 24px 0;
+  text-align: left;
+  width: 100%;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 18px;
+  width: 100%;
+  height: auto;
+}
+.label {
+  position: absolute;
+  left: 14.39px;
+  top: -9.59px;
+  padding: 0px 4.79558px;
+  background: #0F0920;
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 15px;
+  color: #B5B3BC;
+}
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 54px;
+  border: 1.5px solid #F2F0FF;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  color: #F2F0FF;
+  font-family: 'Lato', sans-serif;
+  font-size: 17px;
+  padding: 0 20px;
+  margin-bottom: 0;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.input:focus {
+  border: 1.5px solid #4f8cff;
+  box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.15);
+  background: rgba(255,255,255,0.13);
+}
+.input::placeholder {
+  color: #B5B3BC;
+  opacity: 1;
+}
+.optionsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0;
+}
+.checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1.2px solid #F2F0FF;
+  border-radius: 4px;
+  accent-color: #0368FF;
+}
+.checkbox label {
+  font-family: 'Lato', sans-serif;
+  font-size: 15px;
+  color: #B5B3BC;
+}
+.forgot {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #1877f2;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.forgot:hover {
+  color: #4f8cff;
+  text-decoration: underline;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #b0b3c6;
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1rem;
+  width: 100%;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #35395a;
+  margin: 0 8px;
+}
+.signInBtn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(90deg, #1877f2 0%, #0368FF 100%);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #fff;
+  box-shadow: 0 4px 16px 0 rgba(24, 119, 242, 0.13);
+  margin: 18px 0 0 0;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.signInBtn:hover {
+  background: linear-gradient(90deg, #0368FF 0%, #1877f2 100%);
+  box-shadow: 0 8px 24px 0 rgba(24, 119, 242, 0.18);
+}
+.googleBtn {
+  background: #fff;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+  width: 100%;
+  transition: box-shadow 0.2s;
+}
+.googleBtn:hover {
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.18);
+}
+.googleIcon {
+  width: 20px;
+  height: 20px;
+}
+.signupRow {
+  width: 100%;
+  text-align: center;
+  color: #b0b3c6;
+  font-size: 1rem;
+  margin-bottom: 3.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.signupRow span {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16.7845px;
+  line-height: 21px;
+  color: #B5B3BC;
+}
+.signupLink {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.signupLink:hover {
+  color: #4f8cff;
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .loginCard {
+    left: 50%;
+    max-width: 95vw;
+    transform: translate(-50%, -50%);
+    padding: 32px 10px;
+  }
+  .form {
+    width: 100%;
+  }
+} 
