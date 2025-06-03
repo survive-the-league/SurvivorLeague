@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { db } from "../../middleware/firebase";
+import { useNavigate, useParams } from "react-router-dom";
+import { db } from "../../config/firebase";
 import {
   collection,
   doc,

@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import "./LeagueTable.css";
 import { useParams } from "react-router-dom";
 import { collection, doc, getDoc } from "firebase/firestore";
-import { db } from "../../middleware/firebase";
+import { db } from "../../config/firebase";
 import { MdLockOutline } from "react-icons/md";
 
 // eslint-disable-next-line react/prop-types

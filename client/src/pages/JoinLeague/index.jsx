@@ -1,13 +1,13 @@
-import  { useState } from 'react';
+import  { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, updateDoc, arrayUnion, doc } from 'firebase/firestore';
-import { db } from '../../middleware/firebase';
-import { useAuth } from '../../context/AuthContext';
+import { db } from '../../config/firebase';
+import { AuthContext } from '@/context/Auth/AuthContext';
 import './JoinLeague.css';
 
 const JoinLeague = () => {
     const [leagueCode, setLeagueCode] = useState('');
-    const { currentUser } = useAuth();
+    const { currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleJoinLeague = async (e) => {
