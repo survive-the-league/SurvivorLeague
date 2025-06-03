@@ -1,6 +1,4 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
+
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -11,20 +9,27 @@ import {
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import JoinLeague from "./pages/JoinLeague";
 import { CreateLeaguePage } from "./pages/CreateLeague/CreateLeaguePage";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/Auth/AuthProvider";
 import MakePredictions from "./pages/MakePredictions";
 import League from "./pages/League";
 import Dashboard from "./pages/Dashboard";
 import { LoginPage } from "./pages/Auth/Login/LoginPage";
 import { SignUpPage } from "./pages/Auth/SignUp/SignUpPage";
 import { ForgotPasswordPage } from "./pages/Auth/ForgotPassword/ForgotPassword";
+import { useContext } from "react";
+import { AuthContext } from "./context/Auth/AuthContext";
+
+const RootRedirect = () => {
+  const { currentUser } = useContext(AuthContext);
+  return <Navigate to={currentUser ? "/dashboard" : "/login"} replace />;
+};
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

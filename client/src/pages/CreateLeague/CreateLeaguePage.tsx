@@ -1,20 +1,20 @@
-import  { FC, useState } from 'react';
+import  { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { AuthContext } from '@/context/Auth/AuthContext';
 import { addDoc, collection, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from '../../middleware/firebase';
+import { db } from '../../config/firebase';
 import './CreateLeague.css';
 
 export const CreateLeaguePage: FC = () => {
     const [leagueName, setLeagueName] = useState('');
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser } = useContext(AuthContext);
 
     const generateUniqueCode = () => {
         return Math.random().toString(36).substring(2, 8);
     };
 
-    const handleCreateLeague = async (e) => {
+    const handleCreateLeague = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const uniqueCode = generateUniqueCode();
 
@@ -49,7 +49,7 @@ export const CreateLeaguePage: FC = () => {
         // Add the current user to the league
         querySnapshot.forEach(async (document) => {
             const leagueRef = document.ref;
-            const userRef = doc(db, 'users', currentUser.uid);
+            const userRef = doc(db, 'users', currentUser?.id || '');
             
             // Add the user to the array of users in the league
             await updateDoc(leagueRef, {

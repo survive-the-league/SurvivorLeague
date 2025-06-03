@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { auth, db } from '../../middleware/firebase';
+import { auth, db } from '../../config/firebase';
 import { useParams } from 'react-router-dom';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDocs, getDoc } from 'firebase/firestore';
 import './MakePredictions.css';
