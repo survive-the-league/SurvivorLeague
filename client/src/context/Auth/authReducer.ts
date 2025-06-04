@@ -8,20 +8,10 @@ type AuthAction =
         email: string;
         displayName: string;
         lives: number;
-        idToken: string;
+        token: string;
       };
     }
   | { type: "[AUTH] - Logout" }
-  | {
-      type: "[AUTH] - Register";
-      payload: {
-        id: string;
-        email: string;
-        displayName: string;
-        lives: number;
-        idToken: string;
-      };
-    }
   | { type: "[AUTH] - SetLoading"; payload: boolean };
 
 export const authReducer = (
@@ -39,12 +29,6 @@ export const authReducer = (
       return {
         ...state,
         currentUser: null,
-      };
-
-    case "[AUTH] - Register":
-      return {
-        ...state,
-        currentUser: action.payload,
       };
 
     case "[AUTH] - SetLoading":

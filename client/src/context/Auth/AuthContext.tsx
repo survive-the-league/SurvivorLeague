@@ -6,7 +6,7 @@ export interface AuthContextProps extends AuthState {
     register: (email: string, password: string) => Promise<{ success: boolean, message: string }>;
     logout: () => Promise<{ success: boolean, message: string }>;
     loginWithGoogle: () => Promise<{ success: boolean, message: string }>;
-    verifyToken: () => Promise<{ success: boolean, message: string, user?: AuthState['currentUser'] }>;
+    verifyToken: () => Promise<void>;
     isLoading: boolean;
 }
 

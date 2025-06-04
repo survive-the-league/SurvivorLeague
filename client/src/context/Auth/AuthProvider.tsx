@@ -3,12 +3,7 @@ import { AuthContext } from "./AuthContext";
 import { authReducer } from "./authReducer";
 import { env } from "../../config/env";
 import { auth, googleProvider } from "../../config/firebase";
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import Cookies from "js-cookie";
 
 export interface AuthState {
@@ -16,7 +11,7 @@ export interface AuthState {
     id: string;
     email: string;
     displayName: string;
-    idToken: string;
+    token: string;
   } | null;
   isLoading: boolean;
 }
@@ -34,20 +29,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
 
   useEffect(() => {
-    verifyToken();
+    const initAuth = async () => {
+      dispatch({ type: "[AUTH] - SetLoading", payload: true });
+      await verifyToken();
+      dispatch({ type: "[AUTH] - SetLoading", payload: false });
+    };
+    
+    initAuth();
   }, []);
-
-  useEffect(() => {
-    if (state.currentUser) {
-      Cookies.set("token", state.currentUser.idToken, {
-        expires: 7,
-        secure: true,
-        sameSite: "strict",
-      });
-    } else {
-      Cookies.remove("token");
-    }
-  }, [state.currentUser]);
 
   const login = async (
     email: string,
@@ -71,7 +60,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         id: data.result.user.id,
         email: data.result.user.email,
         displayName: data.result.user.displayName || "",
-        idToken: data.result.token,
+        token: data.result.token,
         lives: data.result.user.lives,
       };
 
@@ -80,7 +69,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         payload: userData,
       });
 
-      console.log("🚀 ~ file: AuthProvider.tsx:84 ~ login ~ data.result.token:", data.result.token)
+      console.log(
+        "🚀 ~ file: AuthProvider.tsx:84 ~ login ~ data.result.token:",
+        data.result.token
+      );
 
       Cookies.set("token", data.result.token, {
         expires: 7,
@@ -115,7 +107,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!data.ok) {
         return { success: false, message: data.error };
       }
-      dispatch({ type: "[AUTH] - Register", payload: data });
+
+      const userData = {
+        id: data.result.user.id,
+        email: data.result.user.email,
+        displayName: data.result.user.displayName || "",
+        token: data.result.token,
+        lives: data.result.user.lives,
+      };
+
+      if (!userData.displayName) {
+        userData.displayName = userData.email.split("@")[0];
+      }
+
+      dispatch({ type: "[AUTH] - Login", payload: userData });
       Cookies.set("token", data.result.token, {
         expires: 7,
         secure: true,
@@ -134,7 +139,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${state.currentUser?.idToken}`,
+          Authorization: `Bearer ${state.currentUser?.token}`,
         },
       });
       const data = await response.json();
@@ -158,7 +163,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
-      const idToken = credential?.idToken;
+      const token = credential?.idToken;
       const user = result.user;
 
       const response = await fetch(`${env.VITE_APP_API_BASE_URL}/auth/google`, {
@@ -185,7 +190,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         id: user.uid,
         email: user.email!,
         displayName: user.displayName!,
-        idToken: idToken!,
+        token: token!,
         lives: 3,
       };
 
@@ -204,59 +209,71 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const verifyToken = async (): Promise<{ success: boolean; message: string; user?: AuthState['currentUser'] }> => {
+  const verifyToken = async (): Promise<void> => {
     try {
       dispatch({ type: "[AUTH] - SetLoading", payload: true });
-      const idToken = Cookies.get('token');
-      
-      if (!idToken) {
+      const token = Cookies.get("token");
+
+      if (!token) {
         dispatch({ type: "[AUTH] - SetLoading", payload: false });
-        return { success: false, message: 'No token found' };
+        return;
       }
 
-      const response = await fetch(`${env.VITE_APP_API_BASE_URL}/auth/verify`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
+      const response = await fetch(
+        `${env.VITE_APP_API_BASE_URL}/auth/refresh`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       const data = await response.json();
-
       if (!data.ok) {
         dispatch({ type: "[AUTH] - SetLoading", payload: false });
-        return { success: false, message: data.error };
+        return;
       }
 
       const userData = {
         id: data.result.user.id,
         email: data.result.user.email,
-        displayName: data.result.user.displayName || '',
-        idToken: idToken,
-        lives: data.result.user.lives
+        displayName: data.result.user.displayName || "",
+        token: data.result.token,
+        lives: data.result.user.lives,
       };
 
+      if (!userData.displayName) {
+        userData.displayName = userData.email.split("@")[0];
+      }
+
       dispatch({
-        type: '[AUTH] - Login',
-        payload: userData
+        type: "[AUTH] - Login",
+        payload: userData,
       });
 
       dispatch({ type: "[AUTH] - SetLoading", payload: false });
-      return { 
-        success: true, 
-        message: 'Token verified successfully',
-        user: userData
-      };
+      Cookies.set("token", data.result.token, {
+        expires: 7,
+        secure: true,
+        sameSite: "strict",
+      });
     } catch (error) {
       console.error(error);
       dispatch({ type: "[AUTH] - SetLoading", payload: false });
-      return { success: false, message: 'Error verifying token' };
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ ...state, login, register, logout, loginWithGoogle, verifyToken }}
+      value={{
+        ...state,
+        login,
+        register,
+        logout,
+        loginWithGoogle,
+        verifyToken,
+      }}
     >
       {children}
     </AuthContext.Provider>
