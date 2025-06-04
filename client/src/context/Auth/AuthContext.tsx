@@ -4,7 +4,7 @@ import { AuthState } from "./AuthProvider";
 export interface AuthContextProps extends AuthState {
     login: (email: string, password: string) => Promise<{ success: boolean, message: string }>;
     register: (email: string, password: string) => Promise<{ success: boolean, message: string }>;
-    logout: () => Promise<{ success: boolean, message: string }>;
+    logout: () => void;
     loginWithGoogle: () => Promise<{ success: boolean, message: string }>;
     verifyToken: () => Promise<void>;
     isLoading: boolean;

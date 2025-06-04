@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await verifyToken();
       dispatch({ type: "[AUTH] - SetLoading", payload: false });
     };
-    
+
     initAuth();
   }, []);
 
@@ -133,26 +133,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const logout = async (): Promise<{ success: boolean; message: string }> => {
+  const logout = (): void => {
     try {
-      const response = await fetch(`${env.VITE_APP_API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${state.currentUser?.token}`,
-        },
-      });
-      const data = await response.json();
-
-      if (!data.ok) {
-        return { success: false, message: data.error };
-      }
       dispatch({ type: "[AUTH] - Logout" });
       Cookies.remove("token");
-      return { success: true, message: "User logged out successfully" };
     } catch (error) {
       console.error(error);
-      return { success: false, message: "Error logging out" };
     }
   };
 
@@ -182,17 +168,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       const data = await response.json();
 
+      console.log(
+        "🚀 ~ file: AuthProvider.tsx:171 ~ loginWithGoogle ~ data:",
+        data
+      );
+
       if (!data.ok) {
         return { success: false, message: data.error };
       }
 
       const userData = {
-        id: user.uid,
-        email: user.email!,
-        displayName: user.displayName!,
-        token: token!,
-        lives: 3,
+        id: data.result.user.id,
+        email: data.result.user.email!,
+        displayName: data.result.user.displayName!,
+        token: data.result.token!,
+        lives: data.result.user.lives,
       };
+
+      if (!userData.displayName) {
+        userData.displayName = userData.email.split("@")[0];
+      }
+
+      Cookies.set("token", data.result.token, {
+        expires: 7,
+        secure: true,
+        sameSite: "strict",
+      });
 
       dispatch({
         type: "[AUTH] - Login",
