@@ -1,4 +1,3 @@
-
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -18,6 +17,7 @@ import { SignUpPage } from "./pages/Auth/SignUp/SignUpPage";
 import { ForgotPasswordPage } from "./pages/Auth/ForgotPassword/ForgotPassword";
 import { useContext } from "react";
 import { AuthContext } from "./context/Auth/AuthContext";
+import Layout from "./components/Layout/Layout";
 
 const RootRedirect = () => {
   const { currentUser } = useContext(AuthContext);
@@ -37,7 +37,9 @@ function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -45,7 +47,9 @@ function App() {
             path="/join-league"
             element={
               <ProtectedRoute>
-                <JoinLeague />
+                <Layout>
+                  <JoinLeague />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -53,7 +57,9 @@ function App() {
             path="/create-league"
             element={
               <ProtectedRoute>
-                <CreateLeaguePage />
+                <Layout>
+                  <CreateLeaguePage />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -61,7 +67,9 @@ function App() {
             path="/league/:leagueId"
             element={
               <ProtectedRoute>
-                <League />
+                <Layout>
+                  <League />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -69,7 +77,9 @@ function App() {
             path="/makePredictions/:leagueId"
             element={
               <ProtectedRoute>
-                <MakePredictions />
+                <Layout>
+                  <MakePredictions />
+                </Layout>
               </ProtectedRoute>
             }
           />

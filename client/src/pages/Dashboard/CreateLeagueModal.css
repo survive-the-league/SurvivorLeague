@@ -1,0 +1,235 @@
+/* Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(20, 15, 40, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal */
+.modal {
+  background: #18112b;
+  color: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.35);
+  border: 1px solid #23203a;
+  padding: 1.2rem 2rem 1.2rem 2rem;
+  width: 100%;
+  max-width: 540px;
+  position: relative;
+}
+
+.modal-close {
+  position: static;
+  background: none;
+  border: none;
+  color: #bdbdbd;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  margin-left: 1.5rem;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-header-bar {
+  background: #1a1430;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.5rem 1.1rem 1.5rem;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  margin: -1.2rem -2rem 1.2rem -2rem;
+}
+
+.modal-header {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 1rem 0 0.7rem 0;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.modal-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: relative;
+}
+
+.modal-group-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-label {
+  font-size: 0.89rem;
+  color: #fff;
+  opacity: 0.6;
+  margin-bottom: 0.05rem;
+}
+
+.modal-input {
+  background: #23203a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.98rem;
+  outline: none;
+  margin-bottom: 0.05rem;
+  transition: box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+}
+
+select.modal-input {
+  background: #23203a;
+  color: #fff;
+  border: 1.5px solid #39324d;
+  border-radius: 10px;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+select.modal-input:focus {
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
+}
+
+select.modal-input option {
+  background: #23203a;
+  color: #fff;
+}
+
+/* Custom arrow for select */
+select.modal-input::-ms-expand {
+  display: none;
+}
+
+.modal-input:focus {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.modal-input-disabled {
+  color: #b3b3b3;
+  opacity: 0.5;
+  background: #23203a;
+  cursor: not-allowed;
+}
+
+.modal-help {
+  font-size: 0.85rem;
+  color: #b3b3b3;
+  opacity: 0.6;
+  margin-top: 0.1rem;
+}
+
+.modal-btn {
+  width: 220px;
+  display: block;
+  margin: 1.2rem 0 0.2rem auto;
+  padding: 0.7rem 0;
+  border: none;
+  border-radius: 6px;
+  background: #1673ff;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-btn:hover {
+  background: #2563eb;
+}
+
+input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: #3b82f6;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-group {
+  position: relative;
+}
+
+select.modal-input {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="28" viewBox="0 0 28 28" width="28" xmlns="http://www.w3.org/2000/svg"><path d="M9.293 11.293a1 1 0 011.414 0L14 14.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.7rem;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #7db7ff;
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.switch input:checked + .slider {
+  background-color: #1673ff;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(17px);
+} 

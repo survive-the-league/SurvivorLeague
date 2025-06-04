@@ -47,26 +47,16 @@ body {
   color: #888;
 }
 .home-bg-main{
-  background: url('./assets/close-up-athlete-playing-soccer.jpg');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  background: #0C061D;
   height: 100vh;
   overflow: auto;
   width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
   position: relative;
-
-
 }
-.home-bg-main::after{
-  z-index: 1;
-  content: ' ';
-  position: absolute;
-  inset: 0;
-  background-color: #000;
-  opacity: 0.5;
 
+.home-bg-main::after{
+  display: none;
 }

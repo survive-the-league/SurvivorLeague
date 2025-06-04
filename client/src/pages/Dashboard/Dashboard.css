@@ -1,104 +1,198 @@
-.dashboard-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #333333cc; /* Dark background */
-  border-radius: 8px;
-  z-index: 2;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  color: white; /* Light text color */
-}
-
-.dashboard-header {
-  margin-bottom: 20px;
-}
-
-.dashboard-nav {
+.leagues-header-row {
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
-  padding: 10px;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  margin-top: 18px;
 }
 
-.nav-link {
-  text-decoration: none;
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
+.leagues-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.leagues-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.dashboard-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-search-icon {
+  position: absolute;
+  left: 16px;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dashboard-search {
+  padding: 14px 18px 14px 44px;
   border-radius: 8px;
-  font-size: 16px;
-  transition: background-color 0.3s, box-shadow 0.3s;
+  border: 1.5px solid #888;
+  background: #181628;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  min-width: 160px;
+  height: 48px;
+  box-sizing: border-box;
 }
 
-.nav-link:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+.dashboard-btn {
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 28px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+  margin-left: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.leagues-section {
-  margin-bottom: 20px;
-}
-
-.leagues-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+.dashboard-btn:hover {
+  background: #125dc1;
 }
 
 .league-card {
-  background-color: #444; /* Dark gray for league cards */
+  width: 100%;
+  background: #120c22;
+  border: 1px solid #3a2d5c;
   border-radius: 8px;
-  padding: 15px;
-  transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-.league-card:hover {
-  background-color: #555; /* Slightly lighter on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 22px 18px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  min-height: 64px;
 }
 
 .league-link {
+  color: #fff;
+  font-size: 1.08rem;
+  font-weight: 500;
   text-decoration: none;
-  color: #f0f0f0; /* Light color for text */
-  font-weight: bold;
-  display: block;
-  text-align: center;
+  margin-right: 18px;
 }
 
-.dashboard-footer {
-  margin-top: 20px;
-  text-align: center;
+.league-info-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
 
-.logout-button {
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.league-date {
+  display: flex;
+  align-items: center;
+  color: #bcb7d0;
+  font-size: 0.98rem;
+  gap: 4px;
 }
 
-.logout-button:hover {
-  background-color: #e60000;
+.league-alert {
+  display: flex;
+  align-items: center;
+  background: #a32a2a;
+  color: #fff;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 0.95rem;
+  gap: 6px;
 }
-@media (max-width:768px) {
-  .dashboard-container {
-    margin-left: 14px;
-    margin-right: 14px;
-  }
+
+.league-users {
+  display: flex;
+  align-items: center;
+  background: #3ad0fb;
+  color: #181628;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  gap: 6px;
 }
-@media (max-width:545px) {
-  .dashboard-container{
-    width: 100%;
-  }
-  .dashboard-nav {
-  flex-direction: column;
-  padding: 0;
-  }
-  .logout-button {
-    width: 100%;
-  }
+
+.league-card-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #181628;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.league-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.league-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.league-users-badge {
+  display: flex;
+  align-items: center;
+  background: #3ad0fb;
+  color: #181628;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  gap: 6px;
+}
+
+.league-users-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon-placeholder {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: #8882;
+  border-radius: 50%;
+}
+
+.dashboard-container {
+  margin-top: 60px;
+  padding: 0 96px;
+}
+
+.dashboard-header {
+  margin-bottom: 12px;
+}
+
+.dashboard-title {
+  font-size: 1rem;
+  color: #bcb7d0;
+  font-weight: 400;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.01em;
+  text-align: left;
 }

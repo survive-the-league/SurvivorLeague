@@ -1,0 +1,16 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.main {
+  flex: 1;
+  padding-top: 72px; /* Height of navbar + some spacing */
+  background-color: #0C061D;
+  min-height: calc(100vh - 72px);
+  width: 100%;
+  position: relative;
+  z-index: 1;
+} 
