@@ -1,20 +1,20 @@
 import { useContext, useEffect, useState } from "react";
-// import { useAuth } from './AuthContext';
 import { Link } from "react-router-dom";
-// import { db } from './firebase';
-// import { doc } from "firebase/firestore";
 import "./Dashboard.css";
 import { AuthContext } from "@/context/Auth/AuthContext";
-// import { db } from "../../config/firebase";
-import PropTypes from "prop-types";
 import { CreateLeagueModal } from "./CreateLeagueModal";
+import { JoinLeagueModal } from "./JoinLeagueModal";
+import axios from "axios";
+import { League } from "@/types/league.types";
 
 const Dashboard = () => {
   const { currentUser, logout } = useContext(AuthContext);
-  // const [leagues, setLeagues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [myLeagues, setMyLeagues] = useState<League[]>([]);
+  const [createdLeagues, setCreatedLeagues] = useState<League[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,8 +24,37 @@ const Dashboard = () => {
       setError(null);
 
       try {
-        // const userRef = doc(db, "users", currentUser.id);
-        // const leaguesRef = collection(db, "leagues");
+        const token = currentUser.token;
+        
+        // Fetch both leagues in parallel
+        const [myLeaguesResponse, createdLeaguesResponse] = await Promise.all([
+          // Fetch leagues where user is a participant
+          axios.get(
+            `${import.meta.env.VITE_APP_API_BASE_URL}/leagues/my-leagues/${currentUser.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          ),
+          // Fetch leagues created by the user
+          axios.get(
+            `${import.meta.env.VITE_APP_API_BASE_URL}/leagues/${currentUser.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          )
+        ]);
+        
+        if (myLeaguesResponse.data.success) {
+          setMyLeagues(myLeaguesResponse.data.data);
+        }
+
+        if (createdLeaguesResponse.data.success) {
+          setCreatedLeagues(createdLeaguesResponse.data.data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Error loading dashboard data");
@@ -37,88 +66,49 @@ const Dashboard = () => {
     fetchData();
   }, [currentUser]);
 
-  // MOCK DATA
-  const mockMyLeagues = [
-    {
-      id: "1",
-      name: "League 1",
-      endDate: "2025-08-05",
-      users: Array(12).fill({ id: "user" }),
-      createdBy: "otherUser",
-    },
-    {
-      id: "2",
-      name: "League 2",
-      endDate: "2025-08-05",
-      users: Array(32).fill({ id: "user" }),
-      createdBy: "otherUser",
-    },
-  ];
-
-  const mockCreatedLeagues = [
-    {
-      id: "3",
-      name: "League 3",
-      endDate: "2025-08-05",
-      users: Array(24).fill({ id: "user" }),
-      createdBy: "currentUser",
-    },
-    {
-      id: "4",
-      name: "League 4",
-      endDate: "2025-08-05",
-      users: Array(12).fill({ id: "user" }),
-      createdBy: "currentUser",
-    },
-  ];
-
-  // --- NUEVO: Filtrar ligas creadas y donde soy miembro ---
-  const myLeagues = mockMyLeagues;
-  const createdLeagues = mockCreatedLeagues;
-
   // --- Función para formatear la fecha ---
-  const formatDate = (_dateStr?: string) => {
-    // Placeholder temporal
-    return "Aug 5, 2025";
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "No end date";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  interface League {
-    id: string;
-    name: string;
-    endDate?: string;
-    users?: { id: string }[];
-    createdBy?: string;
-  }
-
-  const LeagueCard: React.FC<{ league: League }> = ({ league }) => (
-    <div className="league-card">
-      <Link to={`/league/${league.id}`} className="league-link">
-        {league.name}
-      </Link>
-      <div className="league-info-row">
-        <span className="league-date">
-          <i className="fa-regular fa-calendar" style={{ marginRight: 4 }} />
-          Ends {formatDate(league.endDate)}
-        </span>
-        <span className="league-alert">
-          <i
-            className="fa-regular fa-circle-exclamation"
-            style={{ marginRight: 4 }}
-          />
-          Make your MW pick
-        </span>
-        <span className="league-users">
-          <img
-            src="/assets/participants-icon.svg"
-            alt="Participants"
-            className="league-users-icon"
-            style={{ marginRight: 6 }}
-          />
-          {league.users ? league.users.length : 0}
-        </span>
+  const LeagueCard: React.FC<{ league: League }> = ({ league }) => {
+    const pending = Array.isArray((league as any).pendingRequests) && currentUser && (league as any).pendingRequests.includes(currentUser.id);
+    return (
+      <div className="league-card">
+        <Link to={`/league/${league.id}`} className="league-link">
+          {league.name}
+        </Link>
+        <div className="league-info-row">
+          <span className="league-date">
+            <i className="fa-regular fa-calendar" style={{ marginRight: 4 }} />
+            Ends {formatDate(league.endDate)}
+          </span>
+          {pending ? (
+            <span className="pending-chip">Pending approval</span>
+          ) : (
+            <span className="league-alert">
+              <i
+                className="fa-regular fa-circle-exclamation"
+                style={{ marginRight: 4 }}
+              />
+              Make your MW pick
+            </span>
+          )}
+          <span className="league-users">
+            <img
+              src="/assets/participants-icon.svg"
+              alt="Participants"
+              className="league-users-icon"
+              style={{ marginRight: 6 }}
+            />
+            {league.participants.length}
+          </span>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (isLoading) {
     return (
@@ -165,9 +155,13 @@ const Dashboard = () => {
                   className="dashboard-search"
                 />
               </div>
-              <Link to="/join-league" className="dashboard-btn">
+              <button
+                className="dashboard-btn"
+                type="button"
+                onClick={() => setShowJoinModal(true)}
+              >
                 Join A League
-              </Link>
+              </button>
             </div>
           </div>
           <div className="leagues-list">
@@ -214,9 +208,21 @@ const Dashboard = () => {
       <CreateLeagueModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onSubmit={(data) => {
+        onSubmit={(data: League) => {
           setShowCreateModal(false);
-          // Aquí puedes manejar la data del formulario
+          // Add the new league to the created leagues list
+          setCreatedLeagues(prev => [...prev, data]);
+          // Also add it to my leagues since the creator is automatically a member
+          setMyLeagues(prev => [...prev, data]);
+        }}
+      />
+      <JoinLeagueModal
+        open={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        onSubmit={(leagueCode: string) => {
+          setShowJoinModal(false);
+          // Aquí puedes agregar la lógica para unirse a la liga usando el código
+          // Por ahora solo cierra el modal
         }}
       />
     </div>

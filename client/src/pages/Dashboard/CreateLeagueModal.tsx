@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./CreateLeagueModal.css";
+import { createLeague, CreateLeagueData } from "../../services/league.service";
+import { toast } from "react-toastify";
 
 interface CreateLeagueModalProps {
   open: boolean;
@@ -10,8 +12,8 @@ interface CreateLeagueModalProps {
 
 const leagueOptions = [
   { value: "premier", label: "Premier League" },
-  { value: "laliga", label: "La Liga" },
-  { value: "seriea", label: "Serie A" },
+  /* { value: "laliga", label: "La Liga" },
+  { value: "seriea", label: "Serie A" }, */
 ];
 
 const matchWeeks = [
@@ -21,13 +23,15 @@ const matchWeeks = [
 ];
 
 const penaltyOptions = [
-  { value: "loss", label: "Loss of life" },
+  { value: "lose_life", label: "Loss of life" },
   { value: "none", label: "No penalty" },
+  { value: "random_pick", label: "Random pick" },
 ];
 
 const tieOptions = [
-  { value: "wins", label: "Wins" },
-  { value: "losses", label: "Losses" },
+  { value: "win", label: "Win" },
+  { value: "loss", label: "Loss" },
+  { value: "draw", label: "Draw" },
 ];
 
 export const CreateLeagueModal: React.FC<CreateLeagueModalProps> = ({ open, onClose, onSubmit }) => {
@@ -38,11 +42,35 @@ export const CreateLeagueModal: React.FC<CreateLeagueModalProps> = ({ open, onCl
   const [penalty, setPenalty] = useState(penaltyOptions[0].value);
   const [allowReentries, setAllowReentries] = useState(true);
   const [tiesCount, setTiesCount] = useState(tieOptions[0].value);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit({ name, league, matchWeek, lives, penalty, allowReentries, tiesCount });
+    setIsLoading(true);
+
+    try {
+      const leagueData: CreateLeagueData = {
+        name,
+        league,
+        matchWeek,
+        lives,
+        penalty: penalty as 'lose_life' | 'none' | 'random_pick',
+        allowReentries,
+        tiesCount: tiesCount as 'win' | 'loss' | 'draw'
+      };
+
+      const response = await createLeague(leagueData);
+      
+      if (onSubmit) {
+        onSubmit(response.data);
+      }
+      
+      toast.success("League created successfully!");
+      onClose();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Error creating league");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,7 +140,9 @@ export const CreateLeagueModal: React.FC<CreateLeagueModalProps> = ({ open, onCl
             </select>
             <span className="modal-help">How ties are counted in predictions.</span>
           </div>
-          <button type="submit" className="modal-btn">Generate Invite Link</button>
+          <button type="submit" className="modal-btn" disabled={isLoading}>
+            {isLoading ? "Creating..." : "Generate Invite Link"}
+          </button>
         </form>
       </div>
     </div>,
