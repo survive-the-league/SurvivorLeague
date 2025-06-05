@@ -18,6 +18,8 @@ import { ForgotPasswordPage } from "./pages/Auth/ForgotPassword/ForgotPassword";
 import { useContext } from "react";
 import { AuthContext } from "./context/Auth/AuthContext";
 import Layout from "./components/Layout/Layout";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RootRedirect = () => {
   const { currentUser } = useContext(AuthContext);
@@ -28,6 +30,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <ToastContainer position="top-right" autoClose={3000} />
         <Routes>
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
